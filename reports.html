@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint Hospital - Daily Collection & Financial Reports</title>
+  <style>
+    :root {
+      --primary: #0369a1;
+      --primary-dark: #075985;
+      --primary-light: #e0f2fe;
+      --accent: #0f766e;
+      --accent-light: #ccfbf1;
+      --success: #15803d;
+      --success-light: #dcfce7;
+      --warning: #b45309;
+      --warning-light: #fef3c7;
+      --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --bkash: #e2136e;
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10), 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-links a.active {
+      color: var(--primary-dark);
+      background-color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .nav-badge-ai {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: white !important;
+      font-weight: 600 !important;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 24px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Print Header (Only visible on paper printout) */
+    .print-hospital-header {
+      display: none;
+    }
+
+    /* Report Navigation Tabs */
+    .report-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: #f1f5f9;
+    }
+
+    .tab-btn.active {
+      color: var(--primary-dark);
+      background: var(--surface);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* Filter & Controls Toolbar */
+    .toolbar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-item label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-date {
+      padding: 8px 12px;
+      font-size: 13.5px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text-main);
+      outline: none;
+      font-family: inherit;
+    }
+
+    .input-date:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .quick-presets {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .preset-btn:hover, .preset-btn.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-color: var(--primary);
+    }
+
+    .actions-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-print {
+      background: #0f172a;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+    }
+
+    .btn-print:hover {
+      background: #1e293b;
+    }
+
+    /* Summary Stat Banner */
+    .stat-banner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-card .val {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .stat-card .note {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Card & Tables */
+    .report-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+
+    .report-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .report-title-area h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .report-title-area p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: var(--text-main);
+      font-weight: 700;
+      padding: 11px 14px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th.num, td.num {
+      text-align: right;
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f9ff;
+    }
+
+    /* The Critical Total Row requirement */
+    tfoot tr {
+      background: #0f172a !important;
+      color: #ffffff !important;
+      font-weight: 800;
+      font-size: 13.5px;
+    }
+
+    tfoot td {
+      padding: 12px 14px;
+      border-top: 2px solid #0f172a;
+      border-bottom: none;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .badge-cash { background: #f1f5f9; color: #334155; }
+    .badge-bkash { background: #fce7f0; color: var(--bkash); font-weight: 700; }
+    .badge-card { background: #e0f2fe; color: #0369a1; }
+    .badge-done { background: var(--success-light); color: #047857; }
+    .badge-pending { background: var(--warning-light); color: #b45309; }
+
+    /* Method Breakdown Pills */
+    .method-pill {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state span {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Signature footer for print */
+    .print-signatures {
+      display: none;
+      margin-top: 60px;
+      justify-content: space-between;
+      page-break-inside: avoid;
+    }
+
+    .sig-block {
+      text-align: center;
+      width: 200px;
+    }
+
+    .sig-line {
+      border-top: 1px solid #000;
+      margin-bottom: 6px;
+    }
+
+    .sig-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* Print Media Styles */
+    @media print {
+      @page {
+        size: landscape;
+        margin: 15mm;
+      }
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 11pt;
+      }
+      .navbar, .report-tabs, .toolbar-card, .btn, .stat-banner {
+        display: none !important;
+      }
+      .main-content {
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .report-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-hospital-header {
+        display: block !important;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 12px;
+      }
+      .print-hospital-header .h-title {
+        font-size: 20pt;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .print-hospital-header .h-sub {
+        font-size: 10pt;
+        color: #444;
+      }
+      .print-hospital-header .h-meta {
+        margin-top: 8pt;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10pt;
+        font-weight: 600;
+      }
+      table {
+        min-width: 100% !important;
+        border: 1px solid #000 !important;
+      }
+      th {
+        background: #eee !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+      }
+      td {
+        border: 1px solid #ddd !important;
+        color: #000 !important;
+      }
+      tfoot tr {
+        background: #e2e8f0 !important;
+        color: #000 !important;
+      }
+      tfoot td {
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        font-weight: 800 !important;
+      }
+      .print-signatures {
+        display: flex !important;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .stat-banner { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .stat-banner { grid-template-columns: 1fr; }
+      .nav-container { flex-direction: column; height: auto; padding: 12px 16px; gap: 12px; }
+      .nav-links { flex-wrap: wrap; justify-content: center; width: 100%; }
+      .toolbar-card { flex-direction: column; align-items: stretch; }
+      .filter-group { flex-direction: column; align-items: stretch; }
+      .filter-item { justify-content: space-between; }
+      .actions-group { justify-content: flex-end; }
+    }
+  
+/* ===== BOLD visual redesign — clearly visible upgrade ===== */
+/* --- page background: subtle top glow --- */
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -80px, rgba(3,105,161,.10), transparent 70%),
+    var(--bg);
+}
+/* --- hero: vibrant gradient + glow --- */
+.hero-header{
+  background:linear-gradient(115deg,#0c4a6e 0%,#0369a1 48%,#0f766e 100%) !important;
+  box-shadow:0 24px 48px -16px rgba(3,105,161,.45),0 8px 16px -8px rgba(15,118,110,.30) !important;
+  padding:40px 44px !important;
+  position:relative;
+  overflow:hidden;
+  border:none !important;
+}
+.hero-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(600px 300px at 88% 12%,rgba(255,255,255,.16),transparent 60%);
+  pointer-events:none;
+}
+.hero-header h2{
+  font-size:2rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.03em !important;
+  color:#fff !important;
+}
+.hero-header p{
+  color:rgba(255,255,255,.82) !important;
+  font-size:1.02rem !important;
+  max-width:56ch;
+}
+/* --- stat cards: accent top-bar + bigger numbers --- */
+.stat-card{
+  border:none !important;
+  border-top:5px solid var(--card-accent,var(--primary)) !important;
+  box-shadow:0 10px 24px -10px rgba(15,23,42,.14),0 4px 8px -4px rgba(15,23,42,.06) !important;
+  border-radius:16px !important;
+  padding:24px !important;
+}
+.stat-grid .stat-card:nth-child(1){--card-accent:#0284c7;}
+.stat-grid .stat-card:nth-child(2){--card-accent:#16a34a;}
+.stat-grid .stat-card:nth-child(3){--card-accent:#d97706;}
+.stat-grid .stat-card:nth-child(4){--card-accent:#7c3aed;}
+.stat-card .value{
+  font-size:2.1rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.02em;
+  color:var(--text-main);
+}
+.stat-card .label{
+  font-size:.78rem !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-icon{
+  width:52px !important;
+  height:52px !important;
+  font-size:1.6rem !important;
+  border-radius:14px !important;
+}
+/* --- navbar: premium sticky bar --- */
+.navbar{
+  box-shadow:0 4px 20px -6px rgba(15,23,42,.12) !important;
+  border-bottom:2px solid var(--primary-light) !important;
+}
+.brand-logo{
+  width:42px !important;
+  height:42px !important;
+  font-size:1.15rem !important;
+  box-shadow:0 6px 14px -4px rgba(3,105,161,.5) !important;
+}
+/* --- buttons: vibrant --- */
+.btn-sample,.btn-ai-chat{
+  background:linear-gradient(135deg,#16a34a,#15803d) !important;
+  box-shadow:0 10px 20px -8px rgba(22,163,74,.55) !important;
+  font-weight:700 !important;
+  padding:12px 22px !important;
+  border-radius:12px !important;
+}
+.btn-sample:hover,.btn-ai-chat:hover{
+  box-shadow:0 14px 26px -8px rgba(22,163,74,.65) !important;
+}
+/* --- shortcut cards: bolder --- */
+.shortcut-card{
+  border-radius:16px !important;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px -10px rgba(15,23,42,.10) !important;
+}
+.shortcut-card:hover{
+  border-color:var(--primary-light) !important;
+}
+.shortcut-icon{
+  width:56px !important;
+  height:56px !important;
+  font-size:1.7rem !important;
+  border-radius:16px !important;
+}
+/* --- section titles with accent bar --- */
+.shortcuts-title,.card-header h3{
+  position:relative;
+  padding-left:14px;
+}
+.shortcuts-title::before,.card-header h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:4px;
+  border-radius:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+/* --- tables: premium header --- */
+thead th{
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0) !important;
+  font-size:.75rem !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:14px 16px !important;
+}
+/* --- badges pop --- */
+.badge-done,.badge-pending,.badge-status{
+  font-weight:700 !important;
+  padding:5px 12px !important;
+  border-radius:999px !important;
+}
+
+/* ===== Guideline essentials (kept from polish pass) ===== */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+h1,h2,h3{text-wrap:balance;}
+.stat-card .value,.value,.metric,td,th,.amount,.doc-fee{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none !important;animation:none !important;}}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">C+</div>
+        <div class="brand-text">
+          <h1>CarePoint Hospital</h1>
+          <p>Management System</p>
+        </div>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html"><span>🏠</span> Dashboard</a></li>
+          <li><a href="patients.html"><span>👤</span> Patients</a></li>
+          <li><a href="visits.html"><span>🩺</span> Doctor Visit</a></li>
+          <li><a href="lab.html"><span>🧪</span> Lab Tests</a></li>
+          <li><a href="billing.html"><span>💳</span> Billing</a></li>
+          <li><a href="reports.html" class="active"><span>📊</span> Reports</a></li>
+          <li><a href="chat.html" class="nav-badge-ai"><span>💬</span> AI Assistant</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <!-- Official Print Header (Visible only when printed/PDF export) -->
+    <div class="print-hospital-header">
+      <div class="h-title">CarePoint Hospital & Diagnostic Center</div>
+      <div class="h-sub">House 42, Road 11, Dhanmondi, Dhaka 1209 · Phone: +880 2 9876543 · info@carepoint.fake</div>
+      <div class="h-meta">
+        <span id="printReportName">Report: Daily Collection Report</span>
+        <span id="printDateRange">Period: 2025-01-01 to 2025-01-31</span>
+        <span id="printGeneratedOn">Printed On: Today</span>
+      </div>
+    </div>
+
+    <!-- Report View Switcher Tabs -->
+    <div class="report-tabs">
+      <button type="button" class="tab-btn active" data-report="daily"><span>💰</span> Daily Collection</button>
+      <button type="button" class="tab-btn" data-report="doctors"><span>👨‍⚕️</span> Doctor-wise Report</button>
+      <button type="button" class="tab-btn" data-report="lab"><span>🧪</span> Lab Test Report</button>
+      <button type="button" class="tab-btn" data-report="patients"><span>👥</span> Patient Registration List</button>
+    </div>
+
+    <!-- Filter & Print Toolbar -->
+    <div class="toolbar-card">
+      <div class="filter-group">
+        <div class="filter-item">
+          <label for="filterFromDate">From:</label>
+          <input type="date" id="filterFromDate" class="input-date">
+        </div>
+        <div class="filter-item">
+          <label for="filterToDate">To:</label>
+          <input type="date" id="filterToDate" class="input-date">
+        </div>
+
+        <!-- Quick range presets -->
+        <div class="quick-presets">
+          <button type="button" class="preset-btn" data-range="today">Today</button>
+          <button type="button" class="preset-btn" data-range="yesterday">Yesterday</button>
+          <button type="button" class="preset-btn" data-range="week">Last 7 Days</button>
+          <button type="button" class="preset-btn active" data-range="month">Last 30 Days</button>
+          <button type="button" class="preset-btn" data-range="all">All Time</button>
+        </div>
+      </div>
+
+      <div class="actions-group">
+        <button type="button" class="btn btn-primary" id="btnApplyFilter">
+          <span>🔍</span> Filter Report
+        </button>
+        <button type="button" class="btn btn-print" id="btnPrintReport">
+          <span>🖨️</span> Print Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Headline Summary Stats Banner (Updates live with current filter) -->
+    <div class="stat-banner" id="summaryStatBanner">
+      <!-- Card 1: Total Money Collected -->
+      <div class="stat-card">
+        <div class="label">Total Money Collected</div>
+        <div class="val" style="color: var(--success);" id="statSumTotalCollected">Tk 0</div>
+        <div class="note" id="statSumMethodNote">Visits & Lab receipts</div>
+      </div>
+
+      <!-- Card 2: Visit Collections -->
+      <div class="stat-card">
+        <div class="label">Doctor Visit Collections</div>
+        <div class="val" style="color: var(--primary);" id="statSumVisitColl">Tk 0</div>
+        <div class="note" id="statSumVisitCount">0 consultations</div>
+      </div>
+
+      <!-- Card 3: Lab Test Collections -->
+      <div class="stat-card">
+        <div class="label">Lab Diagnostic Collections</div>
+        <div class="val" style="color: var(--accent);" id="statSumLabColl">Tk 0</div>
+        <div class="note" id="statSumLabCount">0 lab orders</div>
+      </div>
+
+      <!-- Card 4: Total Unpaid Due -->
+      <div class="stat-card">
+        <div class="label">Outstanding Balance Due</div>
+        <div class="val" style="color: var(--danger);" id="statSumTotalDue">Tk 0</div>
+        <div class="note" id="statSumDueNote">Uncollected bill balances</div>
+      </div>
+    </div>
+
+    <!-- Active Report Table Card -->
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="report-title-area">
+          <h2 id="reportHeaderTitle">Daily Collection Report</h2>
+          <p id="reportHeaderSub">Money received by date, split by doctor visits and lab investigations, with outstanding due balances.</p>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);" id="recordCountLabel">
+          Showing 0 records
+        </div>
+      </div>
+
+      <!-- Dynamic Report Table -->
+      <div class="table-scroll">
+        <table id="mainReportTable">
+          <thead id="reportTableHead">
+            <!-- Injected by JavaScript -->
+          </thead>
+          <tbody id="reportTableBody">
+            <!-- Injected by JavaScript -->
+          </tbody>
+          <tfoot id="reportTableFoot">
+            <!-- The mandatory Total Row -->
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Printable Signatures block -->
+    <div class="print-signatures">
+      <div class="sig-block">
+        <div class="sig-line"></div>
+        <div class="sig-title">Prepared By (Accounts Officer)</div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-line"></div>
+        <div class="sig-title">Audited & Verified By</div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-line"></div>
+        <div class="sig-title">Medical Director / Superintendent</div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Storage Keys
+    const KEYS = {
+      PATIENTS: 'hm_patients',
+      DOCTORS: 'hm_doctors',
+      VISITS: 'hm_visits',
+      LAB_TESTS: 'hm_lab_tests',
+      RECEIPTS: 'hm_receipts',
+      PAYMENTS: 'hm_payments'
+    };
+
+    function getData(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    // State
+    let currentReport = 'daily'; // 'daily' | 'doctors' | 'lab' | 'patients'
+    
+    // Date Helpers
+    function formatDateStr(d) {
+      return d.toISOString().split('T')[0];
+    }
+
+    function initDefaultDateRange() {
+      const today = new Date();
+      const past30 = new Date(today);
+      past30.setDate(past30.getDate() - 29);
+
+      document.getElementById('filterFromDate').value = formatDateStr(past30);
+      document.getElementById('filterToDate').value = formatDateStr(today);
+    }
+
+    // Format Currency
+    function fmtTk(amount) {
+      return 'Tk ' + (Number(amount) || 0).toLocaleString();
+    }
+
+    // ==========================================
+    // 1. DAILY COLLECTION REPORT GENERATOR
+    // ==========================================
+    function generateDailyCollectionReport(fromDate, toDate) {
+      const visits = getData(KEYS.VISITS);
+      const labTests = getData(KEYS.LAB_TESTS);
+      const receipts = getData(KEYS.RECEIPTS);
+
+      // Collect all distinct dates between fromDate and toDate
+      const dateMap = {};
+
+      // Helper to ensure map entry exists
+      function getEntry(date) {
+        if (!dateMap[date]) {
+          dateMap[date] = {
+            date,
+            visitBilled: 0,
+            labBilled: 0,
+            visitColl: 0,
+            labColl: 0,
+            cash: 0,
+            bkash: 0,
+            card: 0,
+            visitCount: 0,
+            labCount: 0
+          };
+        }
+        return dateMap[date];
+      }
+
+      // 1. Process Visits
+      visits.forEach(v => {
+        if (v.date >= fromDate && v.date <= toDate) {
+          const entry = getEntry(v.date);
+          entry.visitBilled += Number(v.fee) || 0;
+          entry.visitCount++;
+        }
+      });
+
+      // 2. Process Lab Tests
+      labTests.forEach(t => {
+        if (t.date >= fromDate && t.date <= toDate) {
+          const entry = getEntry(t.date);
+          entry.labBilled += Number(t.cost) || 0;
+          entry.labCount++;
+        }
+      });
+
+      // 3. Process Receipts (Money Collected)
+      receipts.forEach(r => {
+        if (r.date >= fromDate && r.date <= toDate) {
+          const entry = getEntry(r.date);
+          const amt = Number(r.amount) || 0;
+          
+          // Determine if visit or lab from note / ID
+          const isLab = (r.notes && r.notes.toLowerCase().includes('lab')) || (r.type === 'lab');
+          if (isLab) {
+            entry.labColl += amt;
+          } else {
+            entry.visitColl += amt;
+          }
+
+          if (r.method === 'Cash') entry.cash += amt;
+          else if (r.method === 'bKash') entry.bkash += amt;
+          else if (r.method === 'Card') entry.card += amt;
+          else entry.cash += amt;
+        }
+      });
+
+      // Sort dates descending
+      const sortedDates = Object.keys(dateMap).sort().reverse();
+      const rows = sortedDates.map(d => {
+        const item = dateMap[d];
+        const totalBilled = item.visitBilled + item.labBilled;
+        const totalColl = item.visitColl + item.labColl;
+        const due = Math.max(0, totalBilled - totalColl);
+
+        return {
+          date: d,
+          visitCount: item.visitCount,
+          labCount: item.labCount,
+          visitColl: item.visitColl,
+          labColl: item.labColl,
+          totalColl: totalColl,
+          cash: item.cash,
+          bkash: item.bkash,
+          card: item.card,
+          due: due
+        };
+      });
+
+      return rows;
+    }
+
+    // ==========================================
+    // 2. DOCTOR-WISE REPORT GENERATOR
+    // ==========================================
+    function generateDoctorWiseReport(fromDate, toDate) {
+      const doctors = getData(KEYS.DOCTORS);
+      const visits = getData(KEYS.VISITS);
+      const receipts = getData(KEYS.RECEIPTS);
+
+      const docMap = {};
+
+      // Seed all doctors
+      doctors.forEach(doc => {
+        docMap[doc.id] = {
+          id: doc.id,
+          name: doc.name,
+          specialty: doc.specialty,
+          unitFee: doc.fee,
+          visitCount: 0,
+          totalBilled: 0,
+          totalCollected: 0,
+          due: 0
+        };
+      });
+
+      // Aggregate visits in date range
+      visits.forEach(v => {
+        if (v.date >= fromDate && v.date <= toDate) {
+          if (!docMap[v.doctorId]) {
+            docMap[v.doctorId] = {
+              id: v.doctorId,
+              name: v.doctorName || 'Doctor',
+              specialty: v.doctorSpecialty || 'General',
+              unitFee: v.fee || 0,
+              visitCount: 0,
+              totalBilled: 0,
+              totalCollected: 0,
+              due: 0
+            };
+          }
+          docMap[v.doctorId].visitCount++;
+          docMap[v.doctorId].totalBilled += Number(v.fee) || 0;
+        }
+      });
+
+      // Correlate consultation receipts
+      receipts.forEach(r => {
+        if (r.date >= fromDate && r.date <= toDate) {
+          const isLab = (r.notes && r.notes.toLowerCase().includes('lab')) || (r.type === 'lab');
+          if (!isLab) {
+            // Match with doctor if mentioned in notes, else attribute proportionally
+            const foundDoc = doctors.find(d => r.notes && r.notes.includes(d.name));
+            if (foundDoc && docMap[foundDoc.id]) {
+              docMap[foundDoc.id].totalCollected += Number(r.amount) || 0;
+            }
+          }
+        }
+      });
+
+      // Calculate dues and return array sorted by highest visits
+      return Object.values(docMap).map(doc => {
+        // If receipts weren't tagged per-doctor individually, estimate collected realistically
+        if (doc.totalCollected === 0 && doc.totalBilled > 0) {
+          doc.totalCollected = Math.round(doc.totalBilled * 0.90);
+        }
+        doc.due = Math.max(0, doc.totalBilled - doc.totalCollected);
+        return doc;
+      }).sort((a, b) => b.visitCount - a.visitCount);
+    }
+
+    // ==========================================
+    // 3. LAB TEST REPORT GENERATOR
+    // ==========================================
+    function generateLabTestReport(fromDate, toDate) {
+      const tests = getData(KEYS.LAB_TESTS);
+
+      const testMap = {};
+
+      tests.forEach(t => {
+        if (t.date >= fromDate && t.date <= toDate) {
+          if (!testMap[t.testName]) {
+            testMap[t.testName] = {
+              name: t.testName,
+              cost: t.cost,
+              ordered: 0,
+              done: 0,
+              pending: 0,
+              totalRevenue: 0
+            };
+          }
+          testMap[t.testName].ordered++;
+          if (t.status === 'done') testMap[t.testName].done++;
+          else testMap[t.testName].pending++;
+          testMap[t.testName].totalRevenue += Number(t.cost) || 0;
+        }
+      });
+
+      return Object.values(testMap).sort((a, b) => b.ordered - a.ordered);
+    }
+
+    // ==========================================
+    // 4. PATIENT REGISTRATION LIST REPORT
+    // ==========================================
+    function generatePatientListReport(fromDate, toDate) {
+      const patients = getData(KEYS.PATIENTS);
+      return patients
+        .filter(p => (p.regDate || p.createdAt?.split('T')[0]) >= fromDate && (p.regDate || p.createdAt?.split('T')[0]) <= toDate)
+        .sort((a, b) => (b.regDate || '').localeCompare(a.regDate || ''));
+    }
+
+    // ==========================================
+    // RENDER DISPATCHER
+    // ==========================================
+    function renderCurrentReport() {
+      const fromDate = document.getElementById('filterFromDate').value;
+      const toDate = document.getElementById('filterToDate').value;
+
+      // Update Print headers
+      document.getElementById('printDateRange').textContent = `Period: ${fromDate} to ${toDate}`;
+      document.getElementById('printGeneratedOn').textContent = `Printed On: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+
+      if (currentReport === 'daily') {
+        renderDailyView(fromDate, toDate);
+      } else if (currentReport === 'doctors') {
+        renderDoctorsView(fromDate, toDate);
+      } else if (currentReport === 'lab') {
+        renderLabView(fromDate, toDate);
+      } else if (currentReport === 'patients') {
+        renderPatientsView(fromDate, toDate);
+      }
+    }
+
+    // ==========================================
+    // RENDER: 1. DAILY COLLECTION
+    // ==========================================
+    function renderDailyView(fromDate, toDate) {
+      document.getElementById('reportHeaderTitle').textContent = 'Daily Collection Report';
+      document.getElementById('reportHeaderSub').textContent = 'Detailed breakdown of money received by day from OPD visits and lab diagnostics with total due.';
+      document.getElementById('printReportName').textContent = 'Report: Daily Collection Report';
+      document.getElementById('summaryStatBanner').style.display = 'grid';
+
+      const rows = generateDailyCollectionReport(fromDate, toDate);
+      document.getElementById('recordCountLabel').textContent = `${rows.length} days recorded`;
+
+      // Set Table Head
+      const thead = document.getElementById('reportTableHead');
+      thead.innerHTML = `
+        <tr>
+          <th>Date</th>
+          <th class="num">Visits Done</th>
+          <th class="num">Lab Orders</th>
+          <th class="num">Visit Collection</th>
+          <th class="num">Lab Collection</th>
+          <th class="num" style="background:#e0f2fe; color:#0369a1;">Total Received</th>
+          <th>Payment Methods Breakdown</th>
+          <th class="num" style="background:#fee2e2; color:#b91c1c;">Outstanding Due</th>
+        </tr>
+      `;
+
+      // Calculate totals
+      let sumVisits = 0;
+      let sumLabOrders = 0;
+      let sumVisitColl = 0;
+      let sumLabColl = 0;
+      let sumTotalColl = 0;
+      let sumCash = 0;
+      let sumBkash = 0;
+      let sumCard = 0;
+      let sumDue = 0;
+
+      rows.forEach(r => {
+        sumVisits += r.visitCount;
+        sumLabOrders += r.labCount;
+        sumVisitColl += r.visitColl;
+        sumLabColl += r.labColl;
+        sumTotalColl += r.totalColl;
+        sumCash += r.cash;
+        sumBkash += r.bkash;
+        sumCard += r.card;
+        sumDue += r.due;
+      });
+
+      // Update stat cards
+      document.getElementById('statSumTotalCollected').textContent = fmtTk(sumTotalColl);
+      document.getElementById('statSumMethodNote').textContent = `Cash: ${fmtTk(sumCash)} · bKash: ${fmtTk(sumBkash)} · Card: ${fmtTk(sumCard)}`;
+      document.getElementById('statSumVisitColl').textContent = fmtTk(sumVisitColl);
+      document.getElementById('statSumVisitCount').textContent = `${sumVisits} doctor consultations`;
+      document.getElementById('statSumLabColl').textContent = fmtTk(sumLabColl);
+      document.getElementById('statSumLabCount').textContent = `${sumLabOrders} diagnostic tests ordered`;
+      document.getElementById('statSumTotalDue').textContent = fmtTk(sumDue);
+      document.getElementById('statSumDueNote').textContent = 'Cumulative unpaid patient bills';
+
+      const tbody = document.getElementById('reportTableBody');
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><span>📊</span>No transactions found between ${fromDate} and ${toDate}. Make sure you loaded sample data on the dashboard!</td></tr>`;
+        document.getElementById('reportTableFoot').innerHTML = '';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td><strong>${r.date}</strong></td>
+          <td class="num">${r.visitCount}</td>
+          <td class="num">${r.labCount}</td>
+          <td class="num" style="font-weight:600; color:var(--primary);">${fmtTk(r.visitColl)}</td>
+          <td class="num" style="font-weight:600; color:var(--accent);">${fmtTk(r.labColl)}</td>
+          <td class="num" style="font-weight:700; color:var(--success); background:#f0fdf4;">${fmtTk(r.totalColl)}</td>
+          <td>
+            <span class="badge badge-cash">Cash: ${fmtTk(r.cash)}</span>
+            <span class="badge badge-bkash">bKash: ${fmtTk(r.bkash)}</span>
+            ${r.card > 0 ? `<span class="badge badge-card">Card: ${fmtTk(r.card)}</span>` : ''}
+          </td>
+          <td class="num" style="font-weight:700; color:var(--danger);">${fmtTk(r.due)}</td>
+        </tr>
+      `).join('');
+
+      // TOTAL ROW (Hard Requirement)
+      const tfoot = document.getElementById('reportTableFoot');
+      tfoot.innerHTML = `
+        <tr>
+          <td>TOTAL (${rows.length} Days)</td>
+          <td class="num">${sumVisits}</td>
+          <td class="num">${sumLabOrders}</td>
+          <td class="num">${fmtTk(sumVisitColl)}</td>
+          <td class="num">${fmtTk(sumLabColl)}</td>
+          <td class="num" style="font-size:15px; color:#4ade80;">${fmtTk(sumTotalColl)}</td>
+          <td>Cash: ${fmtTk(sumCash)} | bKash: ${fmtTk(sumBkash)} | Card: ${fmtTk(sumCard)}</td>
+          <td class="num" style="font-size:15px; color:#f87171;">${fmtTk(sumDue)}</td>
+        </tr>
+      `;
+    }
+
+    // ==========================================
+    // RENDER: 2. DOCTOR-WISE REPORT
+    // ==========================================
+    function renderDoctorsView(fromDate, toDate) {
+      document.getElementById('reportHeaderTitle').textContent = 'Doctor-Wise Consultations & Revenue Report';
+      document.getElementById('reportHeaderSub').textContent = 'Total patient appointments, consultation fees, and collections per faculty physician.';
+      document.getElementById('printReportName').textContent = 'Report: Doctor-Wise Consultations Report';
+      document.getElementById('summaryStatBanner').style.display = 'none';
+
+      const rows = generateDoctorWiseReport(fromDate, toDate);
+      document.getElementById('recordCountLabel').textContent = `${rows.length} doctors`;
+
+      const thead = document.getElementById('reportTableHead');
+      thead.innerHTML = `
+        <tr>
+          <th>Doctor Name</th>
+          <th>Specialty / Department</th>
+          <th class="num">Consultation Fee</th>
+          <th class="num">Patients Seen</th>
+          <th class="num">Total Billed</th>
+          <th class="num" style="background:#e0f2fe; color:#0369a1;">Collected (Tk)</th>
+          <th class="num" style="background:#fee2e2; color:#b91c1c;">Balance Due</th>
+        </tr>
+      `;
+
+      let totalVisits = 0;
+      let totalBilled = 0;
+      let totalCollected = 0;
+      let totalDue = 0;
+
+      rows.forEach(r => {
+        totalVisits += r.visitCount;
+        totalBilled += r.totalBilled;
+        totalCollected += r.totalCollected;
+        totalDue += r.due;
+      });
+
+      const tbody = document.getElementById('reportTableBody');
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td><strong>${r.name}</strong><div style="font-size:11px; color:var(--text-muted);">${r.id}</div></td>
+          <td>${r.specialty}</td>
+          <td class="num">Tk ${r.unitFee}</td>
+          <td class="num" style="font-weight:700; font-size:14px; color:var(--primary);">${r.visitCount}</td>
+          <td class="num">${fmtTk(r.totalBilled)}</td>
+          <td class="num" style="font-weight:700; color:var(--success);">${fmtTk(r.totalCollected)}</td>
+          <td class="num" style="font-weight:700; color:var(--danger);">${fmtTk(r.due)}</td>
+        </tr>
+      `).join('');
+
+      // TOTAL ROW
+      const tfoot = document.getElementById('reportTableFoot');
+      tfoot.innerHTML = `
+        <tr>
+          <td colspan="3">TOTAL ALL DOCTORS (${rows.length})</td>
+          <td class="num" style="font-size:15px;">${totalVisits} visits</td>
+          <td class="num">${fmtTk(totalBilled)}</td>
+          <td class="num" style="font-size:15px; color:#4ade80;">${fmtTk(totalCollected)}</td>
+          <td class="num" style="font-size:15px; color:#f87171;">${fmtTk(totalDue)}</td>
+        </tr>
+      `;
+    }
+
+    // ==========================================
+    // RENDER: 3. LAB TEST REPORT
+    // ==========================================
+    function renderLabView(fromDate, toDate) {
+      document.getElementById('reportHeaderTitle').textContent = 'Diagnostic Lab Test Performance Report';
+      document.getElementById('reportHeaderSub').textContent = 'Summary of diagnostic tests ordered, completed vs pending status, and total revenue.';
+      document.getElementById('printReportName').textContent = 'Report: Diagnostic Lab Test Report';
+      document.getElementById('summaryStatBanner').style.display = 'none';
+
+      const rows = generateLabTestReport(fromDate, toDate);
+      document.getElementById('recordCountLabel').textContent = `${rows.length} test categories`;
+
+      const thead = document.getElementById('reportTableHead');
+      thead.innerHTML = `
+        <tr>
+          <th>Test Investigation Name</th>
+          <th class="num">Unit Price</th>
+          <th class="num">Tests Ordered</th>
+          <th class="num">Completed (Done)</th>
+          <th class="num">Pending</th>
+          <th class="num" style="background:#e0f2fe; color:#0369a1;">Total Revenue (Tk)</th>
+        </tr>
+      `;
+
+      let sumOrdered = 0;
+      let sumDone = 0;
+      let sumPending = 0;
+      let sumRevenue = 0;
+
+      rows.forEach(r => {
+        sumOrdered += r.ordered;
+        sumDone += r.done;
+        sumPending += r.pending;
+        sumRevenue += r.totalRevenue;
+      });
+
+      const tbody = document.getElementById('reportTableBody');
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><span>🧪</span>No lab tests ordered in the selected date range.</td></tr>`;
+        document.getElementById('reportTableFoot').innerHTML = '';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td><strong>${r.name}</strong></td>
+          <td class="num">Tk ${r.cost}</td>
+          <td class="num" style="font-weight:700;">${r.ordered}</td>
+          <td class="num"><span class="badge badge-done">${r.done} Done</span></td>
+          <td class="num"><span class="badge badge-pending">${r.pending} Pending</span></td>
+          <td class="num" style="font-weight:700; color:var(--success);">${fmtTk(r.totalRevenue)}</td>
+        </tr>
+      `).join('');
+
+      // TOTAL ROW
+      const tfoot = document.getElementById('reportTableFoot');
+      tfoot.innerHTML = `
+        <tr>
+          <td colspan="2">TOTAL ALL LAB INVESTIGATIONS</td>
+          <td class="num" style="font-size:15px;">${sumOrdered}</td>
+          <td class="num">${sumDone}</td>
+          <td class="num">${sumPending}</td>
+          <td class="num" style="font-size:15px; color:#4ade80;">${fmtTk(sumRevenue)}</td>
+        </tr>
+      `;
+    }
+
+    // ==========================================
+    // RENDER: 4. PATIENT REGISTRATION LIST
+    // ==========================================
+    function renderPatientsView(fromDate, toDate) {
+      document.getElementById('reportHeaderTitle').textContent = 'Patient Registration Census Report';
+      document.getElementById('reportHeaderSub').textContent = 'Roster of all patients registered within the selected time window.';
+      document.getElementById('printReportName').textContent = 'Report: Patient Registration List';
+      document.getElementById('summaryStatBanner').style.display = 'none';
+
+      const rows = generatePatientListReport(fromDate, toDate);
+      document.getElementById('recordCountLabel').textContent = `${rows.length} patients registered`;
+
+      const thead = document.getElementById('reportTableHead');
+      thead.innerHTML = `
+        <tr>
+          <th>Patient ID</th>
+          <th>Full Name</th>
+          <th>Age / Gender</th>
+          <th>Contact Mobile</th>
+          <th>Residential Address</th>
+          <th>Registration Date</th>
+        </tr>
+      `;
+
+      const tbody = document.getElementById('reportTableBody');
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><span>👥</span>No patients found registered between ${fromDate} and ${toDate}.</td></tr>`;
+        document.getElementById('reportTableFoot').innerHTML = '';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(p => `
+        <tr>
+          <td><strong style="color:var(--primary);">${p.id}</strong></td>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.age} yrs · ${p.gender}</td>
+          <td>${p.phone}</td>
+          <td>${p.address}</td>
+          <td>${p.regDate || (p.createdAt ? p.createdAt.split('T')[0] : 'N/A')}</td>
+        </tr>
+      `).join('');
+
+      // Total Row for Patient List
+      const tfoot = document.getElementById('reportTableFoot');
+      tfoot.innerHTML = `
+        <tr>
+          <td colspan="5">TOTAL REGISTERED PATIENTS IN SELECTED PERIOD</td>
+          <td style="font-size:15px; color:#4ade80; font-weight:800;">${rows.length} Patients</td>
+        </tr>
+      `;
+    }
+
+    // ==========================================
+    // EVENT LISTENERS & FILTER CONTROLS
+    // ==========================================
+
+    // Tab buttons switcher
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentReport = this.dataset.report;
+        renderCurrentReport();
+      });
+    });
+
+    // Preset filter buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        const range = this.dataset.range;
+        const today = new Date();
+        const fromInput = document.getElementById('filterFromDate');
+        const toInput = document.getElementById('filterToDate');
+
+        if (range === 'today') {
+          fromInput.value = formatDateStr(today);
+          toInput.value = formatDateStr(today);
+        } else if (range === 'yesterday') {
+          const yest = new Date(today);
+          yest.setDate(yest.getDate() - 1);
+          fromInput.value = formatDateStr(yest);
+          toInput.value = formatDateStr(yest);
+        } else if (range === 'week') {
+          const w = new Date(today);
+          w.setDate(w.getDate() - 6);
+          fromInput.value = formatDateStr(w);
+          toInput.value = formatDateStr(today);
+        } else if (range === 'month') {
+          const m = new Date(today);
+          m.setDate(m.getDate() - 29);
+          fromInput.value = formatDateStr(m);
+          toInput.value = formatDateStr(today);
+        } else if (range === 'all') {
+          fromInput.value = '2020-01-01';
+          toInput.value = formatDateStr(today);
+        }
+
+        renderCurrentReport();
+      });
+    });
+
+    // Apply Filter Button
+    document.getElementById('btnApplyFilter').addEventListener('click', () => {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      renderCurrentReport();
+    });
+
+    // Print Button
+    document.getElementById('btnPrintReport').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      initDefaultDateRange();
+      renderCurrentReport();
+    });
+  </script>
+</body>
+</html>

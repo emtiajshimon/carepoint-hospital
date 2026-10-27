@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint Hospital - Doctor Visit & Prescription</title>
+  <style>
+    :root {
+      --primary: #0369a1;
+      --primary-dark: #075985;
+      --primary-light: #e0f2fe;
+      --accent: #0f766e;
+      --accent-light: #ccfbf1;
+      --success: #15803d;
+      --success-light: #dcfce7;
+      --warning: #b45309;
+      --warning-light: #fef3c7;
+      --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10), 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 12px 28px -6px rgba(15, 23, 42, 0.14), 0 6px 12px -6px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-links a.active {
+      color: var(--primary-dark);
+      background-color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .nav-badge-ai {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: white !important;
+      font-weight: 600 !important;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title h2 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .page-title p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    /* Two Column Layout */
+    .visit-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Patient Search Bar */
+    .patient-picker-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .search-input-wrap {
+      position: relative;
+    }
+
+    .search-input-wrap input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+    }
+
+    .search-input-wrap .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Search Autocomplete dropdown */
+    .patient-suggestions {
+      margin-top: 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+
+    .patient-suggestion-item {
+      padding: 9px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .patient-suggestion-item:hover {
+      background-color: var(--primary-light);
+    }
+
+    /* Selected Patient Badge Bar */
+    .selected-patient-card {
+      display: none;
+      background: var(--primary-light);
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-top: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .patient-meta-name {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 14px;
+    }
+
+    .patient-meta-sub {
+      font-size: 12px;
+      color: #0369a1;
+      margin-top: 2px;
+    }
+
+    .btn-clear-patient {
+      background: none;
+      border: none;
+      color: #0369a1;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0 4px;
+    }
+
+    /* Form Fields */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .input-field, select, textarea {
+      padding: 9px 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text-main);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .input-field:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    /* Fee pill */
+    .fee-callout {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .fee-callout .fee-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #065f46;
+    }
+
+    .fee-callout .fee-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #047857;
+    }
+
+    /* Medicine prescription rows */
+    .medicine-list-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .medicine-item {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 1fr 36px;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    .btn-remove-med {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: var(--danger);
+      height: 38px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-remove-med:hover {
+      background: #fca5a5;
+    }
+
+    .btn-add-med {
+      background: #f1f5f9;
+      border: 1px dashed var(--border);
+      color: var(--primary);
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .btn-add-med:hover {
+      background: var(--primary-light);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+      text-decoration: none;
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: var(--surface); border-color: var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: #f1f5f9; }
+
+    /* Recent Visits Table on the Right side */
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: 520px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 10px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .id-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    .badge-fee {
+      background: #ecfdf5;
+      color: #047857;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11.5px;
+    }
+
+    .btn-view-rx {
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: var(--primary);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .btn-view-rx:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Rx Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #fff;
+      max-width: 600px;
+      width: 100%;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 28px;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .rx-header {
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .rx-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .rx-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      margin-bottom: 18px;
+    }
+
+    .rx-section {
+      margin-bottom: 16px;
+    }
+
+    .rx-section h4 {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .rx-med-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+    }
+    .rx-med-table th, .rx-med-table td {
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(120px);
+      transition: transform 0.25s ease-out;
+      z-index: 100;
+    }
+    #toast.show { transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      .visit-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .medicine-item { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-container { flex-direction: column; height: auto; padding: 12px 16px; gap: 12px; }
+      .nav-links { flex-wrap: wrap; justify-content: center; width: 100%; }
+      .main-content { padding: 16px 12px; }
+    }
+  
+/* ===== BOLD visual redesign — clearly visible upgrade ===== */
+/* --- page background: subtle top glow --- */
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -80px, rgba(3,105,161,.10), transparent 70%),
+    var(--bg);
+}
+/* --- hero: vibrant gradient + glow --- */
+.hero-header{
+  background:linear-gradient(115deg,#0c4a6e 0%,#0369a1 48%,#0f766e 100%) !important;
+  box-shadow:0 24px 48px -16px rgba(3,105,161,.45),0 8px 16px -8px rgba(15,118,110,.30) !important;
+  padding:40px 44px !important;
+  position:relative;
+  overflow:hidden;
+  border:none !important;
+}
+.hero-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(600px 300px at 88% 12%,rgba(255,255,255,.16),transparent 60%);
+  pointer-events:none;
+}
+.hero-header h2{
+  font-size:2rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.03em !important;
+  color:#fff !important;
+}
+.hero-header p{
+  color:rgba(255,255,255,.82) !important;
+  font-size:1.02rem !important;
+  max-width:56ch;
+}
+/* --- stat cards: accent top-bar + bigger numbers --- */
+.stat-card{
+  border:none !important;
+  border-top:5px solid var(--card-accent,var(--primary)) !important;
+  box-shadow:0 10px 24px -10px rgba(15,23,42,.14),0 4px 8px -4px rgba(15,23,42,.06) !important;
+  border-radius:16px !important;
+  padding:24px !important;
+}
+.stat-grid .stat-card:nth-child(1){--card-accent:#0284c7;}
+.stat-grid .stat-card:nth-child(2){--card-accent:#16a34a;}
+.stat-grid .stat-card:nth-child(3){--card-accent:#d97706;}
+.stat-grid .stat-card:nth-child(4){--card-accent:#7c3aed;}
+.stat-card .value{
+  font-size:2.1rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.02em;
+  color:var(--text-main);
+}
+.stat-card .label{
+  font-size:.78rem !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-icon{
+  width:52px !important;
+  height:52px !important;
+  font-size:1.6rem !important;
+  border-radius:14px !important;
+}
+/* --- navbar: premium sticky bar --- */
+.navbar{
+  box-shadow:0 4px 20px -6px rgba(15,23,42,.12) !important;
+  border-bottom:2px solid var(--primary-light) !important;
+}
+.brand-logo{
+  width:42px !important;
+  height:42px !important;
+  font-size:1.15rem !important;
+  box-shadow:0 6px 14px -4px rgba(3,105,161,.5) !important;
+}
+/* --- buttons: vibrant --- */
+.btn-sample,.btn-ai-chat{
+  background:linear-gradient(135deg,#16a34a,#15803d) !important;
+  box-shadow:0 10px 20px -8px rgba(22,163,74,.55) !important;
+  font-weight:700 !important;
+  padding:12px 22px !important;
+  border-radius:12px !important;
+}
+.btn-sample:hover,.btn-ai-chat:hover{
+  box-shadow:0 14px 26px -8px rgba(22,163,74,.65) !important;
+}
+/* --- shortcut cards: bolder --- */
+.shortcut-card{
+  border-radius:16px !important;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px -10px rgba(15,23,42,.10) !important;
+}
+.shortcut-card:hover{
+  border-color:var(--primary-light) !important;
+}
+.shortcut-icon{
+  width:56px !important;
+  height:56px !important;
+  font-size:1.7rem !important;
+  border-radius:16px !important;
+}
+/* --- section titles with accent bar --- */
+.shortcuts-title,.card-header h3{
+  position:relative;
+  padding-left:14px;
+}
+.shortcuts-title::before,.card-header h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:4px;
+  border-radius:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+/* --- tables: premium header --- */
+thead th{
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0) !important;
+  font-size:.75rem !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:14px 16px !important;
+}
+/* --- badges pop --- */
+.badge-done,.badge-pending,.badge-status{
+  font-weight:700 !important;
+  padding:5px 12px !important;
+  border-radius:999px !important;
+}
+
+/* ===== Guideline essentials (kept from polish pass) ===== */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+h1,h2,h3{text-wrap:balance;}
+.stat-card .value,.value,.metric,td,th,.amount,.doc-fee{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none !important;animation:none !important;}}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">C+</div>
+        <div class="brand-text">
+          <h1>CarePoint Hospital</h1>
+          <p>Management System</p>
+        </div>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html"><span>🏠</span> Dashboard</a></li>
+          <li><a href="patients.html"><span>👤</span> Patients</a></li>
+          <li><a href="visits.html" class="active"><span>🩺</span> Doctor Visit</a></li>
+          <li><a href="lab.html"><span>🧪</span> Lab Tests</a></li>
+          <li><a href="billing.html"><span>💳</span> Billing</a></li>
+          <li><a href="reports.html"><span>📊</span> Reports</a></li>
+          <li><a href="chat.html" class="nav-badge-ai"><span>💬</span> AI Assistant</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <div class="page-header">
+      <div class="page-title">
+        <h2>Doctor Visit & Prescription</h2>
+        <p>Record outpatient consultations, prescribe medicines, and auto-bill consultation fees.</p>
+      </div>
+      <div>
+        <a href="billing.html" class="btn btn-outline">Go to Billing &rarr;</a>
+      </div>
+    </div>
+
+    <div class="visit-grid">
+      
+      <!-- Left Column: Consultation & Prescription Form -->
+      <div class="card">
+        <div class="card-title">
+          <span>🩺</span> New Consultation & Prescription
+        </div>
+
+        <form id="visitForm">
+          
+          <!-- Step 1: Select Patient -->
+          <div class="patient-picker-box">
+            <label style="margin-bottom: 6px; display: block;">1. Select Patient (Search by ID or Name) <span style="color:var(--danger)">*</span></label>
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="patientSearchInput" placeholder="Type patient ID (e.g. P-0001) or name…" autocomplete="off">
+            </div>
+            <div id="patientSuggestions" class="patient-suggestions"></div>
+
+            <!-- Active Selected Patient Details -->
+            <div id="selectedPatientCard" class="selected-patient-card">
+              <div>
+                <div class="patient-meta-name" id="selectedPatientName">Mohammad Rahman (P-0001)</div>
+                <div class="patient-meta-sub" id="selectedPatientInfo">Age: 38 &middot; Male &middot; Phone: 01712345678</div>
+              </div>
+              <button type="button" class="btn-clear-patient" id="btnClearPatient" title="Change patient">&times;</button>
+            </div>
+            <input type="hidden" id="selectedPatientId" required>
+          </div>
+
+          <!-- Step 2: Pick Doctor & Visit Date -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="doctorSelect">2. Pick Consulting Doctor <span style="color:var(--danger)">*</span></label>
+              <select id="doctorSelect" class="input-field" required>
+                <option value="">-- Choose Doctor --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="visitDate">Visit Date <span style="color:var(--danger)">*</span></label>
+              <input type="date" id="visitDate" class="input-field" required>
+            </div>
+          </div>
+
+          <!-- Consultation Fee Display -->
+          <div class="fee-callout">
+            <div>
+              <div class="fee-label">Consultation Fee (Added to Bill)</div>
+              <div style="font-size: 11px; color: #047857;">Auto-recorded in patient billing ledger</div>
+            </div>
+            <div class="fee-value" id="feeDisplay">Tk 0</div>
+          </div>
+
+          <!-- Step 3: Clinical Notes -->
+          <div class="form-group">
+            <label for="symptoms">Symptoms / Chief Complaints <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="symptoms" class="input-field" placeholder="e.g. High fever for 3 days, dry cough, body ache" required>
+          </div>
+
+          <div class="form-group">
+            <label for="diagnosis">Diagnosis / Findings</label>
+            <input type="text" id="diagnosis" class="input-field" placeholder="e.g. Viral URI, Acute Bronchitis">
+          </div>
+
+          <!-- Step 4: Prescription Medicines -->
+          <div class="form-group" style="margin-top: 20px;">
+            <div class="medicine-list-title">
+              <span>Rx / Prescribed Medicines</span>
+              <button type="button" class="btn-add-med" id="btnAddMedRow">+ Add Medicine</button>
+            </div>
+            <div id="medicineRowsContainer">
+              <!-- Default row populated by JS -->
+            </div>
+          </div>
+
+          <!-- Extra Advice / Instructions -->
+          <div class="form-group">
+            <label for="advice">Advice & Follow-up</label>
+            <textarea id="advice" rows="2" class="input-field" placeholder="e.g. Drink warm water, rest for 3 days, revisit next Sunday if fever persists"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="btnResetVisit">Clear</button>
+            <button type="submit" class="btn btn-primary">
+              <span>💾</span> Save Prescription & Bill Fee
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Right Column: Recent Consultations & History -->
+      <div>
+        <div class="card">
+          <div class="card-title">
+            <span>📋</span> Today & Recent Consultations
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Visit ID</th>
+                  <th>Patient</th>
+                  <th>Doctor</th>
+                  <th>Fee</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="visitsTableBody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Quick Tips card -->
+        <div class="card" style="background: #f8fafc; border-style: dashed;">
+          <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--primary-dark);">
+            💡 Billing Workflow Note
+          </h4>
+          <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
+            Saving this visit automatically creates an invoice item in <strong>Billing</strong> under the patient's ID with the doctor's consultation fee in <strong>Taka (Tk)</strong>.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Prescription Viewer Modal -->
+  <div class="modal-backdrop" id="rxModal">
+    <div class="modal-card">
+      <div class="rx-header">
+        <div>
+          <div class="rx-title">CarePoint Hospital</div>
+          <div style="font-size: 12px; color: var(--text-muted);">Outpatient Consultation Prescription</div>
+        </div>
+        <button id="btnCloseModal" style="background:none; border:none; font-size:22px; cursor:pointer;">&times;</button>
+      </div>
+      
+      <div class="rx-meta-grid" id="modalMeta">
+        <!-- Populated via JS -->
+      </div>
+
+      <div class="rx-section">
+        <h4>Chief Complaint & Diagnosis</h4>
+        <p id="modalDiagnosis" style="font-size: 13.5px; font-weight: 600; color: var(--text-main);"></p>
+      </div>
+
+      <div class="rx-section">
+        <h4>Prescribed Medicines</h4>
+        <table class="rx-med-table">
+          <thead>
+            <tr>
+              <th>Medicine</th>
+              <th>Dosage</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody id="modalMedBody"></tbody>
+        </table>
+      </div>
+
+      <div class="rx-section" id="modalAdviceSection">
+        <h4>Doctor's Advice</h4>
+        <p id="modalAdvice" style="font-size: 12.5px; color: #334155; font-style: italic;"></p>
+      </div>
+
+      <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 24px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <button type="button" class="btn btn-outline" onclick="window.print()">🖨️ Print Prescription</button>
+        <button type="button" class="btn btn-primary" id="btnModalClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast">Visit saved and fee billed!</div>
+
+  <script>
+    // Storage keys
+    const KEYS = {
+      PATIENTS: 'hm_patients',
+      DOCTORS: 'hm_doctors',
+      VISITS: 'hm_visits',
+      PAYMENTS: 'hm_payments'
+    };
+
+    // Default doctors fallback if localStorage doesn't have them yet
+    const DEFAULT_DOCTORS = [
+      { id: 'DOC-1', name: 'Dr. Mohammad Rahman', specialty: 'General Medicine', fee: 800 },
+      { id: 'DOC-2', name: 'Dr. Fatima Khan', specialty: 'Cardiology', fee: 1200 },
+      { id: 'DOC-3', name: 'Dr. Anisur Zaman', specialty: 'Pediatrics', fee: 700 },
+      { id: 'DOC-4', name: 'Dr. Nusrat Jahan', specialty: 'Gynecology', fee: 1000 },
+      { id: 'DOC-5', name: 'Dr. Tanvir Ahmed', specialty: 'Orthopedics', fee: 900 }
+    ];
+
+    function getData(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setData(key, val) {
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Initialize Doctors
+    function initDoctors() {
+      let doctors = getData(KEYS.DOCTORS);
+      if (!doctors || doctors.length === 0) {
+        doctors = DEFAULT_DOCTORS;
+        setData(KEYS.DOCTORS, doctors);
+      }
+      const select = document.getElementById('doctorSelect');
+      select.innerHTML = '<option value="">-- Choose Consulting Doctor --</option>';
+      doctors.forEach(doc => {
+        const opt = document.createElement('option');
+        opt.value = doc.id;
+        opt.dataset.fee = doc.fee;
+        opt.dataset.name = doc.name;
+        opt.dataset.specialty = doc.specialty;
+        opt.textContent = `${doc.name} (${doc.specialty}) — Tk ${doc.fee}`;
+        select.appendChild(opt);
+      });
+    }
+
+    // Patient Autocomplete Search
+    const searchInput = document.getElementById('patientSearchInput');
+    const suggestionsBox = document.getElementById('patientSuggestions');
+    const selectedCard = document.getElementById('selectedPatientCard');
+    const selectedPatientId = document.getElementById('selectedPatientId');
+
+    searchInput.addEventListener('input', function() {
+      const q = this.value.trim().toLowerCase();
+      if (!q) {
+        suggestionsBox.style.display = 'none';
+        return;
+      }
+
+      const patients = getData(KEYS.PATIENTS);
+      const matches = patients.filter(p => 
+        (p.id && p.id.toLowerCase().includes(q)) ||
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.phone && p.phone.toLowerCase().includes(q))
+      ).slice(0, 8);
+
+      if (matches.length === 0) {
+        suggestionsBox.innerHTML = '<div style="padding:10px; font-size:12px; color:#64748b;">No matching patients found.</div>';
+        suggestionsBox.style.display = 'block';
+        return;
+      }
+
+      suggestionsBox.innerHTML = matches.map(p => `
+        <div class="patient-suggestion-item" onclick="selectPatient('${p.id}')">
+          <div>
+            <strong>${p.name}</strong> <span style="font-family:monospace; color:var(--primary); font-size:11.5px;">(${p.id})</span>
+          </div>
+          <div style="font-size:11.5px; color:#64748b;">${p.gender}, ${p.age}y &middot; ${p.phone}</div>
+        </div>
+      `).join('');
+      suggestionsBox.style.display = 'block';
+    });
+
+    window.selectPatient = function(id) {
+      const patients = getData(KEYS.PATIENTS);
+      const patient = patients.find(p => p.id === id);
+      if (!patient) return;
+
+      selectedPatientId.value = patient.id;
+      document.getElementById('selectedPatientName').textContent = `${patient.name} (${patient.id})`;
+      document.getElementById('selectedPatientInfo').textContent = `Age: ${patient.age}y · ${patient.gender} · Phone: ${patient.phone} · ${patient.address || ''}`;
+      
+      selectedCard.style.display = 'flex';
+      searchInput.value = '';
+      suggestionsBox.style.display = 'none';
+    };
+
+    document.getElementById('btnClearPatient').addEventListener('click', function() {
+      selectedPatientId.value = '';
+      selectedCard.style.display = 'none';
+      searchInput.value = '';
+      searchInput.focus();
+    });
+
+    // Close suggestions on outside click
+    document.addEventListener('click', function(e) {
+      if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+        suggestionsBox.style.display = 'none';
+      }
+    });
+
+    // Update fee display on doctor change
+    document.getElementById('doctorSelect').addEventListener('change', function() {
+      const selected = this.options[this.selectedIndex];
+      const fee = selected.dataset.fee || 0;
+      document.getElementById('feeDisplay').textContent = `Tk ${Number(fee).toLocaleString()}`;
+    });
+
+    // Medicine Row Repeater
+    const medContainer = document.getElementById('medicineRowsContainer');
+    function addMedRow(name = '', dose = '', duration = '') {
+      const div = document.createElement('div');
+      div.className = 'medicine-item';
+      div.innerHTML = `
+        <input type="text" class="input-field med-name" placeholder="Medicine (e.g. Tab Napa 500mg)" value="${name}" required>
+        <input type="text" class="input-field med-dose" placeholder="Dose (1+0+1 after meal)" value="${dose}">
+        <input type="text" class="input-field med-dur" placeholder="Duration (5 days)" value="${duration}">
+        <button type="button" class="btn-remove-med" onclick="this.parentElement.remove()" title="Remove medicine">&times;</button>
+      `;
+      medContainer.appendChild(div);
+    }
+
+    document.getElementById('btnAddMedRow').addEventListener('click', () => addMedRow());
+
+    // Generate Visit ID
+    function generateVisitId() {
+      const visits = getData(KEYS.VISITS);
+      return 'V-' + String(visits.length + 101).padStart(4, '0');
+    }
+
+    // Reset Form
+    function resetVisitForm() {
+      document.getElementById('visitForm').reset();
+      selectedPatientId.value = '';
+      selectedCard.style.display = 'none';
+      medContainer.innerHTML = '';
+      addMedRow('Tab Napa 500mg', '1+0+1 (After meal)', '5 days');
+      addMedRow('Syp Tusca', '2 tsp 3 times daily', '7 days');
+      document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('feeDisplay').textContent = 'Tk 0';
+    }
+
+    // Save Visit & Add to Bill
+    document.getElementById('visitForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const patientId = selectedPatientId.value;
+      if (!patientId) {
+        alert('Please search and pick a patient first!');
+        searchInput.focus();
+        return;
+      }
+
+      const docSelect = document.getElementById('doctorSelect');
+      const docOption = docSelect.options[docSelect.selectedIndex];
+      if (!docSelect.value) {
+        alert('Please select a doctor.');
+        return;
+      }
+
+      const doctorId = docSelect.value;
+      const doctorName = docOption.dataset.name;
+      const doctorSpecialty = docOption.dataset.specialty;
+      const fee = Number(docOption.dataset.fee) || 0;
+      const visitDate = document.getElementById('visitDate').value;
+      const symptoms = document.getElementById('symptoms').value.trim();
+      const diagnosis = document.getElementById('diagnosis').value.trim();
+      const advice = document.getElementById('advice').value.trim();
+
+      // Collect medicines
+      const medRows = medContainer.querySelectorAll('.medicine-item');
+      const medicines = [];
+      medRows.forEach(row => {
+        const name = row.querySelector('.med-name').value.trim();
+        const dose = row.querySelector('.med-dose').value.trim();
+        const dur = row.querySelector('.med-dur').value.trim();
+        if (name) {
+          medicines.push({ name, dose, duration: dur });
+        }
+      });
+
+      const visitId = generateVisitId();
+      const newVisit = {
+        id: visitId,
+        patientId: patientId,
+        doctorId: doctorId,
+        doctorName: doctorName,
+        specialty: doctorSpecialty,
+        fee: fee,
+        date: visitDate,
+        symptoms: symptoms,
+        diagnosis: diagnosis,
+        medicines: medicines,
+        advice: advice,
+        createdAt: new Date().toISOString()
+      };
+
+      // 1. Save Visit Record
+      const visits = getData(KEYS.VISITS);
+      visits.push(newVisit);
+      setData(KEYS.VISITS, visits);
+
+      // 2. Add consultation fee to billing ledger (hm_payments)
+      const payments = getData(KEYS.PAYMENTS);
+      const billRecord = {
+        id: 'BILL-' + (payments.length + 1001),
+        patientId: patientId,
+        type: 'visit',
+        referenceId: visitId,
+        description: `Consultation Fee - ${doctorName} (${doctorSpecialty})`,
+        amount: fee,
+        total: fee,
+        paid: 0,
+        due: fee,
+        method: 'Pending',
+        status: 'Unpaid',
+        date: visitDate,
+        createdAt: new Date().toISOString()
+      };
+      payments.push(billRecord);
+      setData(KEYS.PAYMENTS, payments);
+
+      showToast(`Prescription ${visitId} saved! Fee Tk ${fee} added to patient bill.`);
+      resetVisitForm();
+      renderVisitsTable();
+    });
+
+    // Render Recent Visits Table
+    function renderVisitsTable() {
+      const visits = getData(KEYS.VISITS);
+      const patients = getData(KEYS.PATIENTS);
+      const patientMap = {};
+      patients.forEach(p => { patientMap[p.id] = p.name; });
+
+      const tbody = document.getElementById('visitsTableBody');
+      const recent = [...visits].reverse().slice(0, 15);
+
+      if (recent.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 28px; color: var(--text-muted);">
+              No consultation visits recorded yet. Complete the form to prescribe and bill.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = recent.map(v => `
+        <tr>
+          <td><span class="id-badge">${v.id}</span></td>
+          <td>
+            <strong>${patientMap[v.patientId] || v.patientId}</strong><br>
+            <span style="font-size:11px; color:var(--text-muted);">${v.date}</span>
+          </td>
+          <td>
+            ${v.doctorName || 'Doctor'}<br>
+            <span style="font-size:11px; color:var(--text-muted);">${v.specialty || ''}</span>
+          </td>
+          <td><span class="badge-fee">Tk ${v.fee || 0}</span></td>
+          <td>
+            <button class="btn-view-rx" onclick="openRxModal('${v.id}')">View Rx</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Modal view for Rx
+    window.openRxModal = function(visitId) {
+      const visits = getData(KEYS.VISITS);
+      const patients = getData(KEYS.PATIENTS);
+      const v = visits.find(item => item.id === visitId);
+      if (!v) return;
+
+      const p = patients.find(item => item.id === v.patientId) || { name: 'Unknown', age: '-', gender: '-', phone: '-' };
+
+      document.getElementById('modalMeta').innerHTML = `
+        <div><strong>Patient:</strong> ${p.name} (${v.patientId})</div>
+        <div><strong>Date:</strong> ${v.date}</div>
+        <div><strong>Age/Sex:</strong> ${p.age}y &middot; ${p.gender}</div>
+        <div><strong>Doctor:</strong> ${v.doctorName}</div>
+      `;
+
+      document.getElementById('modalDiagnosis').textContent = 
+        `Chief Complaint: ${v.symptoms || 'N/A'} | Diagnosis: ${v.diagnosis || 'N/A'}`;
+
+      const medBody = document.getElementById('modalMedBody');
+      if (v.medicines && v.medicines.length > 0) {
+        medBody.innerHTML = v.medicines.map(m => `
+          <tr>
+            <td><strong>${m.name}</strong></td>
+            <td>${m.dose || '-'}</td>
+            <td>${m.duration || '-'}</td>
+          </tr>
+        `).join('');
+      } else {
+        medBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No medications recorded</td></tr>';
+      }
+
+      document.getElementById('modalAdvice').textContent = v.advice || 'None specified.';
+      document.getElementById('rxModal').style.display = 'flex';
+    };
+
+    function closeModal() {
+      document.getElementById('rxModal').style.display = 'none';
+    }
+
+    document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+    document.getElementById('btnModalClose').addEventListener('click', closeModal);
+
+    // Check URL parameters for pre-selected patient (e.g. from patients.html?patientId=P-0001)
+    function checkUrlPatientParam() {
+      const params = new URLSearchParams(window.location.search);
+      const pId = params.get('patientId');
+      if (pId) {
+        selectPatient(pId);
+      }
+    }
+
+    // Init Page
+    window.addEventListener('DOMContentLoaded', () => {
+      initDoctors();
+      resetVisitForm();
+      renderVisitsTable();
+      checkUrlPatientParam();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint Hospital - Patient Registration Census Report</title>
+  <style>
+    :root {
+      --primary: #0369a1;
+      --primary-dark: #075985;
+      --primary-light: #e0f2fe;
+      --accent: #0f766e;
+      --accent-light: #ccfbf1;
+      --success: #15803d;
+      --success-light: #dcfce7;
+      --warning: #b45309;
+      --warning-light: #fef3c7;
+      --danger: #b91c1c;
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10), 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-links a.active {
+      color: var(--primary-dark);
+      background-color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .nav-badge-ai {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: white !important;
+      font-weight: 600 !important;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 24px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Print Header (Only visible on paper / PDF export) */
+    .print-hospital-header {
+      display: none;
+    }
+
+    /* Sub-navigation tabs for Reports */
+    .report-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background: #f1f5f9;
+    }
+
+    .tab-btn.active {
+      color: var(--primary-dark);
+      background: var(--surface);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* Filter & Controls Toolbar */
+    .toolbar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-item label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-date {
+      padding: 8px 12px;
+      font-size: 13.5px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text-main);
+      outline: none;
+      font-family: inherit;
+    }
+
+    .input-date:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .quick-presets {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .preset-btn:hover, .preset-btn.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-color: var(--primary);
+    }
+
+    .actions-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-print {
+      background: #0f172a;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+    }
+
+    .btn-print:hover {
+      background: #1e293b;
+    }
+
+    /* Summary Metric Pills */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-card .val {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .metric-card .sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Main Table Card */
+    .report-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+
+    .report-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .report-title-area h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .report-title-area p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .search-sub-bar {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 9px 14px;
+      font-size: 13.5px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      min-width: 820px;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: var(--text-main);
+      font-weight: 700;
+      padding: 12px 14px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th.num, td.num {
+      text-align: right;
+    }
+
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f9ff;
+    }
+
+    /* MANDATORY TOTAL ROW */
+    tfoot tr {
+      background: #0f172a !important;
+      color: #ffffff !important;
+      font-weight: 800;
+      font-size: 13.5px;
+    }
+
+    tfoot td {
+      padding: 14px;
+      border-top: 2px solid #0f172a;
+      border-bottom: none;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .badge-male { background: #e0f2fe; color: #0369a1; }
+    .badge-female { background: #fce7f3; color: #be185d; }
+    .badge-other { background: #f1f5f9; color: #475569; }
+
+    .id-tag {
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state span {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Print Signatures Block */
+    .print-signatures {
+      display: none;
+      margin-top: 60px;
+      justify-content: space-between;
+      page-break-inside: avoid;
+    }
+
+    .sig-block {
+      text-align: center;
+      width: 200px;
+    }
+
+    .sig-line {
+      border-top: 1px solid #000;
+      margin-bottom: 6px;
+    }
+
+    .sig-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    /* Print Media Styles */
+    @media print {
+      @page {
+        size: portrait;
+        margin: 15mm;
+      }
+      body {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 10.5pt;
+      }
+      .navbar, .report-tabs, .toolbar-card, .metric-grid, .search-sub-bar, .btn {
+        display: none !important;
+      }
+      .main-content {
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .report-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-hospital-header {
+        display: block !important;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 12px;
+      }
+      .print-hospital-header .h-title {
+        font-size: 18pt;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .print-hospital-header .h-sub {
+        font-size: 9.5pt;
+        color: #444;
+      }
+      .print-hospital-header .h-meta {
+        margin-top: 8pt;
+        display: flex;
+        justify-content: space-between;
+        font-size: 9.5pt;
+        font-weight: 600;
+      }
+      table {
+        min-width: 100% !important;
+        border: 1px solid #000 !important;
+      }
+      th {
+        background: #f1f5f9 !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+      }
+      td {
+        border: 1px solid #ddd !important;
+        color: #000 !important;
+      }
+      tfoot tr {
+        background: #e2e8f0 !important;
+        color: #000 !important;
+      }
+      tfoot td {
+        color: #000 !important;
+        border: 1px solid #000 !important;
+        font-weight: 800 !important;
+      }
+      .print-signatures {
+        display: flex !important;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .metric-grid { grid-template-columns: 1fr; }
+      .nav-container { flex-direction: column; height: auto; padding: 12px 16px; gap: 12px; }
+      .nav-links { flex-wrap: wrap; justify-content: center; width: 100%; }
+      .toolbar-card { flex-direction: column; align-items: stretch; }
+      .filter-group { flex-direction: column; align-items: stretch; }
+      .filter-item { justify-content: space-between; }
+      .actions-group { justify-content: flex-end; }
+    }
+  
+/* ===== BOLD visual redesign — clearly visible upgrade ===== */
+/* --- page background: subtle top glow --- */
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -80px, rgba(3,105,161,.10), transparent 70%),
+    var(--bg);
+}
+/* --- hero: vibrant gradient + glow --- */
+.hero-header{
+  background:linear-gradient(115deg,#0c4a6e 0%,#0369a1 48%,#0f766e 100%) !important;
+  box-shadow:0 24px 48px -16px rgba(3,105,161,.45),0 8px 16px -8px rgba(15,118,110,.30) !important;
+  padding:40px 44px !important;
+  position:relative;
+  overflow:hidden;
+  border:none !important;
+}
+.hero-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(600px 300px at 88% 12%,rgba(255,255,255,.16),transparent 60%);
+  pointer-events:none;
+}
+.hero-header h2{
+  font-size:2rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.03em !important;
+  color:#fff !important;
+}
+.hero-header p{
+  color:rgba(255,255,255,.82) !important;
+  font-size:1.02rem !important;
+  max-width:56ch;
+}
+/* --- stat cards: accent top-bar + bigger numbers --- */
+.stat-card{
+  border:none !important;
+  border-top:5px solid var(--card-accent,var(--primary)) !important;
+  box-shadow:0 10px 24px -10px rgba(15,23,42,.14),0 4px 8px -4px rgba(15,23,42,.06) !important;
+  border-radius:16px !important;
+  padding:24px !important;
+}
+.stat-grid .stat-card:nth-child(1){--card-accent:#0284c7;}
+.stat-grid .stat-card:nth-child(2){--card-accent:#16a34a;}
+.stat-grid .stat-card:nth-child(3){--card-accent:#d97706;}
+.stat-grid .stat-card:nth-child(4){--card-accent:#7c3aed;}
+.stat-card .value{
+  font-size:2.1rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.02em;
+  color:var(--text-main);
+}
+.stat-card .label{
+  font-size:.78rem !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-icon{
+  width:52px !important;
+  height:52px !important;
+  font-size:1.6rem !important;
+  border-radius:14px !important;
+}
+/* --- navbar: premium sticky bar --- */
+.navbar{
+  box-shadow:0 4px 20px -6px rgba(15,23,42,.12) !important;
+  border-bottom:2px solid var(--primary-light) !important;
+}
+.brand-logo{
+  width:42px !important;
+  height:42px !important;
+  font-size:1.15rem !important;
+  box-shadow:0 6px 14px -4px rgba(3,105,161,.5) !important;
+}
+/* --- buttons: vibrant --- */
+.btn-sample,.btn-ai-chat{
+  background:linear-gradient(135deg,#16a34a,#15803d) !important;
+  box-shadow:0 10px 20px -8px rgba(22,163,74,.55) !important;
+  font-weight:700 !important;
+  padding:12px 22px !important;
+  border-radius:12px !important;
+}
+.btn-sample:hover,.btn-ai-chat:hover{
+  box-shadow:0 14px 26px -8px rgba(22,163,74,.65) !important;
+}
+/* --- shortcut cards: bolder --- */
+.shortcut-card{
+  border-radius:16px !important;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px -10px rgba(15,23,42,.10) !important;
+}
+.shortcut-card:hover{
+  border-color:var(--primary-light) !important;
+}
+.shortcut-icon{
+  width:56px !important;
+  height:56px !important;
+  font-size:1.7rem !important;
+  border-radius:16px !important;
+}
+/* --- section titles with accent bar --- */
+.shortcuts-title,.card-header h3{
+  position:relative;
+  padding-left:14px;
+}
+.shortcuts-title::before,.card-header h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:4px;
+  border-radius:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+/* --- tables: premium header --- */
+thead th{
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0) !important;
+  font-size:.75rem !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:14px 16px !important;
+}
+/* --- badges pop --- */
+.badge-done,.badge-pending,.badge-status{
+  font-weight:700 !important;
+  padding:5px 12px !important;
+  border-radius:999px !important;
+}
+
+/* ===== Guideline essentials (kept from polish pass) ===== */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+h1,h2,h3{text-wrap:balance;}
+.stat-card .value,.value,.metric,td,th,.amount,.doc-fee{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none !important;animation:none !important;}}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">C+</div>
+        <div class="brand-text">
+          <h1>CarePoint Hospital</h1>
+          <p>Management System</p>
+        </div>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html"><span>🏠</span> Dashboard</a></li>
+          <li><a href="patients.html"><span>👤</span> Patients</a></li>
+          <li><a href="visits.html"><span>🩺</span> Doctor Visit</a></li>
+          <li><a href="lab.html"><span>🧪</span> Lab Tests</a></li>
+          <li><a href="billing.html"><span>💳</span> Billing</a></li>
+          <li><a href="reports.html" class="active"><span>📊</span> Reports</a></li>
+          <li><a href="chat.html" class="nav-badge-ai"><span>💬</span> AI Assistant</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <!-- Official Print Header (Visible only when printed or exported as PDF) -->
+    <div class="print-hospital-header">
+      <div class="h-title">CarePoint Hospital & Diagnostic Center</div>
+      <div class="h-sub">House 42, Road 11, Dhanmondi, Dhaka 1209 · Phone: +880 2 9876543 · info@carepoint.fake</div>
+      <div class="h-meta">
+        <span id="printReportName">Report: Patient Registration Census Report</span>
+        <span id="printDateRange">Period: 2025-01-01 to 2025-01-31</span>
+        <span id="printGeneratedOn">Printed On: Today</span>
+      </div>
+    </div>
+
+    <!-- Sub-navigation Tabs for Reports -->
+    <div class="report-tabs">
+      <a href="reports.html" class="tab-btn"><span>💰</span> Daily Collection</a>
+      <a href="reports.html?tab=doctors" class="tab-btn"><span>👨‍⚕️</span> Doctor-wise Report</a>
+      <a href="reports.html?tab=lab" class="tab-btn"><span>🧪</span> Lab Test Report</a>
+      <a href="report-patients.html" class="tab-btn active"><span>👥</span> Patient Registration List</a>
+    </div>
+
+    <!-- Date Range Filter & Print Toolbar -->
+    <div class="toolbar-card">
+      <div class="filter-group">
+        <div class="filter-item">
+          <label for="filterFromDate">From:</label>
+          <input type="date" id="filterFromDate" class="input-date">
+        </div>
+        <div class="filter-item">
+          <label for="filterToDate">To:</label>
+          <input type="date" id="filterToDate" class="input-date">
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="quick-presets">
+          <button type="button" class="preset-btn" data-range="today">Today</button>
+          <button type="button" class="preset-btn" data-range="yesterday">Yesterday</button>
+          <button type="button" class="preset-btn" data-range="week">Last 7 Days</button>
+          <button type="button" class="preset-btn active" data-range="month">Last 30 Days</button>
+          <button type="button" class="preset-btn" data-range="all">All Time</button>
+        </div>
+      </div>
+
+      <div class="actions-group">
+        <button type="button" class="btn btn-primary" id="btnApplyFilter">
+          <span>🔍</span> Filter Patients
+        </button>
+        <button type="button" class="btn btn-print" id="btnPrintReport">
+          <span>🖨️</span> Print Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Demographic Metric Grid -->
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="label">Total Registered</div>
+        <div class="val" style="color: var(--primary);" id="metricTotal">0</div>
+        <div class="sub" id="metricPeriodSub">in selected period</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Male Patients</div>
+        <div class="val" style="color: #0284c7;" id="metricMale">0</div>
+        <div class="sub" id="metricMalePct">0% of total</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Female Patients</div>
+        <div class="val" style="color: #be185d;" id="metricFemale">0</div>
+        <div class="sub" id="metricFemalePct">0% of total</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Average Patient Age</div>
+        <div class="val" style="color: var(--accent);" id="metricAvgAge">0 yrs</div>
+        <div class="sub">Across registered cohort</div>
+      </div>
+    </div>
+
+    <!-- Patient Census Table Card -->
+    <div class="report-card">
+      <div class="report-card-header">
+        <div class="report-title-area">
+          <h2>Patient Registration Census Report</h2>
+          <p>Official chronological record of new patient registrations within the specified date boundaries.</p>
+        </div>
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-muted);" id="recordCountLabel">
+          Showing 0 patients
+        </div>
+      </div>
+
+      <!-- Quick Search Filter within results -->
+      <div class="search-sub-bar">
+        <input type="text" id="filterKeyword" class="search-input" placeholder="Quick search filtered cohort by Name, Phone, Address, or Patient ID…">
+      </div>
+
+      <!-- Scrollable Table -->
+      <div class="table-scroll">
+        <table id="patientReportTable">
+          <thead>
+            <tr>
+              <th style="width: 50px;">#</th>
+              <th>Reg. Date</th>
+              <th>Patient ID</th>
+              <th>Full Legal Name</th>
+              <th>Gender</th>
+              <th class="num">Age</th>
+              <th>Contact Phone</th>
+              <th>Primary Address / Area</th>
+            </tr>
+          </thead>
+          <tbody id="patientTableBody">
+            <!-- Injected by JavaScript -->
+          </tbody>
+          <tfoot id="patientTableFoot">
+            <!-- Hard requirement: Total Row -->
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Print Signatures Section -->
+    <div class="print-signatures">
+      <div class="sig-block">
+        <div class="sig-line"></div>
+        <div class="sig-title">Registration Officer (Front Desk)</div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-line"></div>
+        <div class="sig-title">Records & IT In-Charge</div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-line"></div>
+        <div class="sig-title">Hospital Superintendent</div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'hm_patients';
+
+    function getPatients() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        console.error('Failed to load patients', e);
+        return [];
+      }
+    }
+
+    function formatDate(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    function initDates() {
+      const today = new Date();
+      const past30 = new Date(today);
+      past30.setDate(past30.getDate() - 29);
+
+      document.getElementById('filterFromDate').value = formatDate(past30);
+      document.getElementById('filterToDate').value = formatDate(today);
+    }
+
+    function renderReport() {
+      const fromDate = document.getElementById('filterFromDate').value;
+      const toDate = document.getElementById('filterToDate').value;
+      const query = (document.getElementById('filterKeyword').value || '').trim().toLowerCase();
+
+      // Update print meta headers
+      document.getElementById('printDateRange').textContent = `Period: ${fromDate} to ${toDate}`;
+      document.getElementById('printGeneratedOn').textContent = `Printed On: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+
+      const allPatients = getPatients();
+
+      // 1. Filter by Date range
+      const dateFiltered = allPatients.filter(p => {
+        const regDate = p.regDate || (p.createdAt ? p.createdAt.split('T')[0] : '');
+        return regDate >= fromDate && regDate <= toDate;
+      });
+
+      // 2. Filter by search keyword
+      const finalPatients = dateFiltered.filter(p => {
+        if (!query) return true;
+        const idMatch = (p.id || '').toLowerCase().includes(query);
+        const nameMatch = (p.name || '').toLowerCase().includes(query);
+        const phoneMatch = (p.phone || '').includes(query);
+        const addrMatch = (p.address || '').toLowerCase().includes(query);
+        return idMatch || nameMatch || phoneMatch || addrMatch;
+      });
+
+      // Sort chronological descending
+      finalPatients.sort((a, b) => {
+        const dateA = a.regDate || (a.createdAt ? a.createdAt.split('T')[0] : '');
+        const dateB = b.regDate || (b.createdAt ? b.createdAt.split('T')[0] : '');
+        return dateB.localeCompare(dateA);
+      });
+
+      // Update Summary Metrics
+      const totalCount = finalPatients.length;
+      let maleCount = 0;
+      let femaleCount = 0;
+      let otherCount = 0;
+      let totalAge = 0;
+
+      finalPatients.forEach(p => {
+        const g = (p.gender || '').toLowerCase();
+        if (g === 'male') maleCount++;
+        else if (g === 'female') femaleCount++;
+        else otherCount++;
+
+        totalAge += (Number(p.age) || 0);
+      });
+
+      const avgAge = totalCount > 0 ? (totalAge / totalCount).toFixed(1) : 0;
+      const malePct = totalCount > 0 ? Math.round((maleCount / totalCount) * 100) : 0;
+      const femalePct = totalCount > 0 ? Math.round((femaleCount / totalCount) * 100) : 0;
+
+      document.getElementById('metricTotal').textContent = totalCount;
+      document.getElementById('metricPeriodSub').textContent = `${fromDate} to ${toDate}`;
+      document.getElementById('metricMale').textContent = maleCount;
+      document.getElementById('metricMalePct').textContent = `${malePct}% of filtered cohort`;
+      document.getElementById('metricFemale').textContent = femaleCount;
+      document.getElementById('metricFemalePct').textContent = `${femalePct}% of filtered cohort`;
+      document.getElementById('metricAvgAge').textContent = `${avgAge} yrs`;
+      document.getElementById('recordCountLabel').textContent = `Showing ${totalCount} of ${allPatients.length} total patients`;
+
+      // Render Table
+      const tbody = document.getElementById('patientTableBody');
+      const tfoot = document.getElementById('patientTableFoot');
+
+      if (totalCount === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty-state">
+              <span>👥</span>
+              No patients registered between <strong>${fromDate}</strong> and <strong>${toDate}</strong>.
+              <br><small style="color:var(--text-muted);">Ensure you have loaded sample data from the dashboard.</small>
+            </td>
+          </tr>
+        `;
+        tfoot.innerHTML = '';
+        return;
+      }
+
+      tbody.innerHTML = finalPatients.map((p, idx) => {
+        const regDate = p.regDate || (p.createdAt ? p.createdAt.split('T')[0] : 'N/A');
+        const g = (p.gender || 'Other').toLowerCase();
+        let badgeClass = 'badge-other';
+        if (g === 'male') badgeClass = 'badge-male';
+        if (g === 'female') badgeClass = 'badge-female';
+
+        return `
+          <tr>
+            <td style="color: var(--text-muted); font-size: 11.5px;">${idx + 1}</td>
+            <td><strong>${regDate}</strong></td>
+            <td><span class="id-tag">${p.id}</span></td>
+            <td><strong>${p.name}</strong></td>
+            <td><span class="badge ${badgeClass}">${p.gender || 'Not specified'}</span></td>
+            <td class="num">${p.age}</td>
+            <td>${p.phone || 'N/A'}</td>
+            <td>${p.address || 'Dhaka'}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // TOTAL ROW REQUIREMENT
+      tfoot.innerHTML = `
+        <tr>
+          <td colspan="4">TOTAL PATIENT REGISTRATIONS IN SELECTED PERIOD</td>
+          <td colspan="2" class="num" style="font-size: 15px; color: #4ade80;">
+            ${totalCount} Patients (Avg: ${avgAge} yrs)
+          </td>
+          <td colspan="2">
+            Breakdown: ${maleCount} Male · ${femaleCount} Female ${otherCount > 0 ? `· ${otherCount} Other` : ''}
+          </td>
+        </tr>
+      `;
+    }
+
+    // Event Listeners
+    document.getElementById('btnApplyFilter').addEventListener('click', () => {
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      renderReport();
+    });
+
+    document.getElementById('filterKeyword').addEventListener('input', renderReport);
+
+    document.getElementById('btnPrintReport').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Preset Date Buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        const range = this.dataset.range;
+        const today = new Date();
+        const fromInput = document.getElementById('filterFromDate');
+        const toInput = document.getElementById('filterToDate');
+
+        if (range === 'today') {
+          fromInput.value = formatDate(today);
+          toInput.value = formatDate(today);
+        } else if (range === 'yesterday') {
+          const yest = new Date(today);
+          yest.setDate(yest.getDate() - 1);
+          fromInput.value = formatDate(yest);
+          toInput.value = formatDate(yest);
+        } else if (range === 'week') {
+          const w = new Date(today);
+          w.setDate(w.getDate() - 6);
+          fromInput.value = formatDate(w);
+          toInput.value = formatDate(today);
+        } else if (range === 'month') {
+          const m = new Date(today);
+          m.setDate(m.getDate() - 29);
+          fromInput.value = formatDate(m);
+          toInput.value = formatDate(today);
+        } else if (range === 'all') {
+          fromInput.value = '2020-01-01';
+          toInput.value = formatDate(today);
+        }
+
+        renderReport();
+      });
+    });
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      initDates();
+      renderReport();
+    });
+  </script>
+</body>
+</html>

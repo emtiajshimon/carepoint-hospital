@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint Hospital - Patient Registration</title>
+  <style>
+    :root {
+      --primary: #0369a1;
+      --primary-dark: #075985;
+      --primary-light: #e0f2fe;
+      --accent: #0f766e;
+      --accent-light: #ccfbf1;
+      --success: #15803d;
+      --success-light: #dcfce7;
+      --warning: #b45309;
+      --warning-light: #fef3c7;
+      --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10), 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 12px 28px -6px rgba(15, 23, 42, 0.14), 0 6px 12px -6px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation */
+    .navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-links a.active {
+      color: var(--primary-dark);
+      background-color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .nav-badge-ai {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: white !important;
+      font-weight: 600 !important;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title h2 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .page-title p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    /* Layout: Form on Left, Stats/Guide on Right on Desktop */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+
+    .form-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .input-field, select, textarea {
+      padding: 9px 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text-main);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .input-field:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    .input-readonly {
+      background-color: #f1f5f9;
+      font-weight: 700;
+      color: var(--primary-dark);
+      cursor: not-allowed;
+      letter-spacing: 0.5px;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-outline {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+
+    /* Search & Table Card */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .table-header-bar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #fafafa;
+    }
+
+    .table-header-bar h3 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 280px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+    }
+
+    .search-box span.search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: 480px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 750px;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 11px 16px;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .id-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11.5px;
+      font-family: monospace;
+    }
+
+    .gender-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: var(--text-muted);
+    }
+    .gender-pill.Male { background: #e0f2fe; color: #0369a1; }
+    .gender-pill.Female { background: #fce7f3; color: #be185d; }
+
+    .action-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action-sm {
+      padding: 4px 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-action-sm:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .table-footer {
+      padding: 12px 20px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      background: #fafafa;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(120px);
+      transition: transform 0.25s ease-out;
+      z-index: 100;
+    }
+    #toast.show {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      .nav-container {
+        flex-direction: column;
+        height: auto;
+        padding: 12px 16px;
+        gap: 12px;
+      }
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+      }
+      .main-content {
+        padding: 16px 12px;
+      }
+      .search-box {
+        min-width: 100%;
+      }
+      .form-actions {
+        flex-direction: column;
+      }
+      .form-actions button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  
+/* ===== BOLD visual redesign — clearly visible upgrade ===== */
+/* --- page background: subtle top glow --- */
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -80px, rgba(3,105,161,.10), transparent 70%),
+    var(--bg);
+}
+/* --- hero: vibrant gradient + glow --- */
+.hero-header{
+  background:linear-gradient(115deg,#0c4a6e 0%,#0369a1 48%,#0f766e 100%) !important;
+  box-shadow:0 24px 48px -16px rgba(3,105,161,.45),0 8px 16px -8px rgba(15,118,110,.30) !important;
+  padding:40px 44px !important;
+  position:relative;
+  overflow:hidden;
+  border:none !important;
+}
+.hero-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(600px 300px at 88% 12%,rgba(255,255,255,.16),transparent 60%);
+  pointer-events:none;
+}
+.hero-header h2{
+  font-size:2rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.03em !important;
+  color:#fff !important;
+}
+.hero-header p{
+  color:rgba(255,255,255,.82) !important;
+  font-size:1.02rem !important;
+  max-width:56ch;
+}
+/* --- stat cards: accent top-bar + bigger numbers --- */
+.stat-card{
+  border:none !important;
+  border-top:5px solid var(--card-accent,var(--primary)) !important;
+  box-shadow:0 10px 24px -10px rgba(15,23,42,.14),0 4px 8px -4px rgba(15,23,42,.06) !important;
+  border-radius:16px !important;
+  padding:24px !important;
+}
+.stat-grid .stat-card:nth-child(1){--card-accent:#0284c7;}
+.stat-grid .stat-card:nth-child(2){--card-accent:#16a34a;}
+.stat-grid .stat-card:nth-child(3){--card-accent:#d97706;}
+.stat-grid .stat-card:nth-child(4){--card-accent:#7c3aed;}
+.stat-card .value{
+  font-size:2.1rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.02em;
+  color:var(--text-main);
+}
+.stat-card .label{
+  font-size:.78rem !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-icon{
+  width:52px !important;
+  height:52px !important;
+  font-size:1.6rem !important;
+  border-radius:14px !important;
+}
+/* --- navbar: premium sticky bar --- */
+.navbar{
+  box-shadow:0 4px 20px -6px rgba(15,23,42,.12) !important;
+  border-bottom:2px solid var(--primary-light) !important;
+}
+.brand-logo{
+  width:42px !important;
+  height:42px !important;
+  font-size:1.15rem !important;
+  box-shadow:0 6px 14px -4px rgba(3,105,161,.5) !important;
+}
+/* --- buttons: vibrant --- */
+.btn-sample,.btn-ai-chat{
+  background:linear-gradient(135deg,#16a34a,#15803d) !important;
+  box-shadow:0 10px 20px -8px rgba(22,163,74,.55) !important;
+  font-weight:700 !important;
+  padding:12px 22px !important;
+  border-radius:12px !important;
+}
+.btn-sample:hover,.btn-ai-chat:hover{
+  box-shadow:0 14px 26px -8px rgba(22,163,74,.65) !important;
+}
+/* --- shortcut cards: bolder --- */
+.shortcut-card{
+  border-radius:16px !important;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px -10px rgba(15,23,42,.10) !important;
+}
+.shortcut-card:hover{
+  border-color:var(--primary-light) !important;
+}
+.shortcut-icon{
+  width:56px !important;
+  height:56px !important;
+  font-size:1.7rem !important;
+  border-radius:16px !important;
+}
+/* --- section titles with accent bar --- */
+.shortcuts-title,.card-header h3{
+  position:relative;
+  padding-left:14px;
+}
+.shortcuts-title::before,.card-header h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:4px;
+  border-radius:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+/* --- tables: premium header --- */
+thead th{
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0) !important;
+  font-size:.75rem !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:14px 16px !important;
+}
+/* --- badges pop --- */
+.badge-done,.badge-pending,.badge-status{
+  font-weight:700 !important;
+  padding:5px 12px !important;
+  border-radius:999px !important;
+}
+
+/* ===== Guideline essentials (kept from polish pass) ===== */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+h1,h2,h3{text-wrap:balance;}
+.stat-card .value,.value,.metric,td,th,.amount,.doc-fee{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none !important;animation:none !important;}}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">C+</div>
+        <div class="brand-text">
+          <h1>CarePoint Hospital</h1>
+          <p>Management System</p>
+        </div>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html"><span>🏠</span> Dashboard</a></li>
+          <li><a href="patients.html" class="active"><span>👤</span> Patients</a></li>
+          <li><a href="visits.html"><span>🩺</span> Doctor Visit</a></li>
+          <li><a href="lab.html"><span>🧪</span> Lab Tests</a></li>
+          <li><a href="billing.html"><span>💳</span> Billing</a></li>
+          <li><a href="reports.html"><span>📊</span> Reports</a></li>
+          <li><a href="chat.html" class="nav-badge-ai"><span>💬</span> AI Assistant</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <div class="page-header">
+      <div class="page-title">
+        <h2>Patient Registration</h2>
+        <p>Register new outdoor patients and search the registered directory.</p>
+      </div>
+      <div>
+        <a href="index.html" class="btn btn-outline">&larr; Back to Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Registration Form -->
+    <div class="form-card">
+      <div class="form-card-title">
+        <span>➕</span> Register New Patient
+      </div>
+      <form id="patientForm">
+        <div class="form-grid">
+          
+          <!-- Auto-generated Patient ID -->
+          <div class="form-group">
+            <label for="patientId">Patient ID (Auto-Generated)</label>
+            <input type="text" id="patientId" class="input-field input-readonly" readonly>
+          </div>
+
+          <!-- Full Name -->
+          <div class="form-group">
+            <label for="fullName">Full Name <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="fullName" class="input-field" placeholder="e.g. Mohammad Rahman" required autofocus>
+          </div>
+
+          <!-- Age -->
+          <div class="form-group">
+            <label for="age">Age (Years) <span style="color:var(--danger)">*</span></label>
+            <input type="number" id="age" class="input-field" placeholder="e.g. 38" min="1" max="120" required>
+          </div>
+
+          <!-- Sex -->
+          <div class="form-group">
+            <label for="gender">Sex <span style="color:var(--danger)">*</span></label>
+            <select id="gender" class="input-field" required>
+              <option value="">Select Sex</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- Phone Number -->
+          <div class="form-group">
+            <label for="phone">Phone Number <span style="color:var(--danger)">*</span></label>
+            <input type="tel" id="phone" class="input-field" placeholder="e.g. 01712345678" required>
+          </div>
+
+          <!-- Registration Date -->
+          <div class="form-group">
+            <label for="regDate">Registration Date</label>
+            <input type="date" id="regDate" class="input-field">
+          </div>
+
+          <!-- Address -->
+          <div class="form-group full-width">
+            <label for="address">Address / Area <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="address" class="input-field" placeholder="e.g. House #12, Road #4, Dhanmondi, Dhaka" required>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" id="btnResetForm">Clear Form</button>
+          <button type="submit" class="btn btn-primary">
+            <span>💾</span> Save Patient Record
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Searchable Patient Table -->
+    <div class="table-card">
+      <div class="table-header-bar">
+        <h3>
+          <span>📋</span> Registered Patients Directory
+        </h3>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search by ID, Name, Phone, or City…">
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Full Name</th>
+              <th>Age & Sex</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Registered Date</th>
+              <th>Quick Actions</th>
+            </tr>
+          </thead>
+          <tbody id="patientTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <span id="patientCountText">Showing 0 patients</span>
+        <span style="font-size: 11.5px;">Auto-synced with localStorage</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast">Patient saved successfully!</div>
+
+  <script>
+    const STORAGE_KEY = 'hm_patients';
+
+    // LocalStorage Helpers
+    function getPatients() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      try {
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function savePatients(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Auto-generate Patient ID like P-0001, P-0042, etc.
+    function generateNextPatientId() {
+      const patients = getPatients();
+      if (patients.length === 0) return 'P-0001';
+
+      // Extract numeric portions of IDs matching P-XXXX
+      let maxNum = 0;
+      patients.forEach(p => {
+        if (p.id) {
+          const match = p.id.match(/\d+/);
+          if (match) {
+            const num = parseInt(match[0], 10);
+            if (num > maxNum) maxNum = num;
+          }
+        }
+      });
+
+      const nextNum = maxNum + 1;
+      return 'P-' + String(nextNum).padStart(4, '0');
+    }
+
+    // Set today's date in YYYY-MM-DD
+    function setTodayDate() {
+      const d = new Date();
+      const todayStr = d.toISOString().split('T')[0];
+      document.getElementById('regDate').value = todayStr;
+    }
+
+    // Initialize / Reset form
+    function resetForm() {
+      document.getElementById('patientForm').reset();
+      document.getElementById('patientId').value = generateNextPatientId();
+      setTodayDate();
+      document.getElementById('fullName').focus();
+    }
+
+    // Render Table Rows
+    function renderTable(filterQuery = '') {
+      const patients = getPatients();
+      const tbody = document.getElementById('patientTableBody');
+      const query = filterQuery.toLowerCase().trim();
+
+      const filtered = patients.filter(p => {
+        if (!query) return true;
+        return (
+          (p.id && p.id.toLowerCase().includes(query)) ||
+          (p.name && p.name.toLowerCase().includes(query)) ||
+          (p.phone && p.phone.toLowerCase().includes(query)) ||
+          (p.address && p.address.toLowerCase().includes(query))
+        );
+      });
+
+      // Display newest registrations first
+      const displayList = [...filtered].reverse();
+
+      if (displayList.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+              ${query ? 'No matching patients found for "' + filterQuery + '".' : 'No patients registered yet. Complete the form above or click "Load Sample Data" on the Dashboard.'}
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = displayList.map(p => `
+          <tr>
+            <td><span class="id-badge">${p.id}</span></td>
+            <td><strong>${escapeHtml(p.name)}</strong></td>
+            <td>
+              ${p.age} yrs &middot; 
+              <span class="gender-pill ${p.gender}">${p.gender}</span>
+            </td>
+            <td>${escapeHtml(p.phone)}</td>
+            <td style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(p.address)}">
+              ${escapeHtml(p.address)}
+            </td>
+            <td>${p.createdAt || 'N/A'}</td>
+            <td>
+              <div class="action-links">
+                <a href="visits.html?patientId=${encodeURIComponent(p.id)}" class="btn-action-sm" title="Consultation">
+                  🩺 Visit
+                </a>
+                <a href="lab.html?patientId=${encodeURIComponent(p.id)}" class="btn-action-sm" title="Order Lab">
+                  🧪 Lab
+                </a>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      document.getElementById('patientCountText').textContent = 
+        `Showing ${displayList.length} of ${patients.length} patient${patients.length === 1 ? '' : 's'}`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Save Patient Handler
+    document.getElementById('patientForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('patientId').value.trim();
+      const name = document.getElementById('fullName').value.trim();
+      const age = parseInt(document.getElementById('age').value, 10);
+      const gender = document.getElementById('gender').value;
+      const phone = document.getElementById('phone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const regDate = document.getElementById('regDate').value || new Date().toISOString().split('T')[0];
+
+      if (!name || !age || !gender || !phone || !address) {
+        alert('Please fill out all required fields.');
+        return;
+      }
+
+      const newPatient = {
+        id: id,
+        name: name,
+        age: age,
+        gender: gender,
+        phone: phone,
+        address: address,
+        createdAt: regDate
+      };
+
+      const patients = getPatients();
+      patients.push(newPatient);
+      savePatients(patients);
+
+      showToast(`Patient ${name} (${id}) registered successfully!`);
+      resetForm();
+      renderTable(document.getElementById('searchInput').value);
+    });
+
+    // Reset Form button
+    document.getElementById('btnResetForm').addEventListener('click', resetForm);
+
+    // Live Search
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      renderTable(e.target.value);
+    });
+
+    // Page Load Setup
+    window.addEventListener('DOMContentLoaded', () => {
+      resetForm();
+      renderTable();
+    });
+  </script>
+</body>
+</html>

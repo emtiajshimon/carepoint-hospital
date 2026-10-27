@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — CarePoint Hospital</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: #eef6ff; color: #0f172a; }
+  .navbar { background: #020617; padding: 14px 22px; }
+  .navbar a { color: #fff; text-decoration: none; font-weight: 700; font-size: 18px; }
+  .navbar span { color: #7dd3fc; font-weight: 400; font-size: 13px; margin-left: 8px; }
+  main { max-width: 640px; margin: 32px auto; padding: 0 16px; }
+  .card { background: #fff; border: 1px solid #dbeafe; border-radius: 14px; padding: 24px; box-shadow: 0 4px 18px rgba(2, 6, 23, 0.06); }
+  h1 { margin: 0 0 6px; font-size: 24px; }
+  p { color: #475569; line-height: 1.6; }
+  label { display: block; font-weight: 600; margin: 18px 0 8px; }
+  input[type="password"], input[type="text"] { width: 100%; padding: 12px; font-size: 15px; border: 1px solid #cbd5e1; border-radius: 8px; }
+  .row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  button { cursor: pointer; border: 0; border-radius: 8px; padding: 11px 18px; font-size: 15px; font-weight: 600; }
+  .save { background: #4f46e5; color: #fff; }
+  .clear { background: #fee2e2; color: #991b1b; }
+  .ghost { background: #e2e8f0; color: #0f172a; }
+  #status { margin-top: 16px; font-weight: 600; }
+  #status.ok { color: #15803d; }
+  #status.empty { color: #b45309; }
+  .note { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 16px; margin-top: 22px; }
+  .note code { background: #e2e8f0; padding: 1px 6px; border-radius: 5px; }
+  .links { margin-top: 20px; }
+  .links a { color: #4f46e5; font-weight: 600; text-decoration: none; margin-right: 16px; }
+</style>
+</head>
+<body>
+  <div class="navbar">
+    <a href="index.html">CarePoint Hospital</a><span>Management System</span>
+  </div>
+  <main>
+    <div class="card">
+      <h1>⚙️ Settings</h1>
+      <p>Put your ChatterMate API key here once. The AI Report Chat will use this key for every question. Anyone testing this project can paste <strong>their own</strong> key — nobody needs to share a key with anyone.</p>
+
+      <label for="apiKeyInput">ChatterMate API key</label>
+      <input type="password" id="apiKeyInput" placeholder="Paste your ChatterMate API key here" autocomplete="off">
+      <div class="row">
+        <button class="ghost" id="toggleBtn" type="button">Show key</button>
+        <button class="save" id="saveBtn" type="button">Save key</button>
+        <button class="clear" id="clearBtn" type="button">Remove key</button>
+      </div>
+      <div id="status" class="empty">No key saved yet.</div>
+
+      <div class="note">
+        <strong>How this works</strong><br>
+        • Your key is saved only in <em>this browser</em> (localStorage). It is never written into any project file, so it can never be pushed to GitHub.<br>
+        • When you ask the AI chat a question, the browser sends the saved key to your own local server (<code>POST /ask</code>), which forwards it to ChatterMate.<br>
+        • No key in Settings? The server falls back to the <code>CHATTERMATE_API_KEY</code> in your local <code>.env</code> file — which is ignored by git (<code>.gitignore</code>), so it is not pushed either.<br>
+        • Never paste a real key into a file you plan to push to GitHub.
+      </div>
+
+      <div class="links">
+        <a href="chat.html">→ Go to AI Report Chat</a>
+        <a href="index.html">→ Back to Dashboard</a>
+      </div>
+    </div>
+  </main>
+  <script>
+    var KEY_NAME = 'carepoint_api_key';
+    var input = document.getElementById('apiKeyInput');
+    var statusEl = document.getElementById('status');
+
+    function refreshStatus() {
+      var saved = localStorage.getItem(KEY_NAME);
+      if (saved) {
+        statusEl.textContent = 'Key saved in this browser. The AI chat will use it.';
+        statusEl.className = 'ok';
+      } else {
+        statusEl.textContent = 'No key saved yet.';
+        statusEl.className = 'empty';
+      }
+    }
+
+    document.getElementById('saveBtn').addEventListener('click', function () {
+      var value = input.value.trim();
+      if (!value) {
+        statusEl.textContent = 'Paste a key first, then press Save key.';
+        statusEl.className = 'empty';
+        return;
+      }
+      localStorage.setItem(KEY_NAME, value);
+      input.value = '';
+      refreshStatus();
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', function () {
+      localStorage.removeItem(KEY_NAME);
+      input.value = '';
+      refreshStatus();
+    });
+
+    document.getElementById('toggleBtn').addEventListener('click', function (e) {
+      var show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      e.target.textContent = show ? 'Hide key' : 'Show key';
+    });
+
+    refreshStatus();
+  </script>
+</body>
+</html>

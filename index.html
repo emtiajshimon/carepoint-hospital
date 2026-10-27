@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint Hospital - Dashboard</title>
+  <style>
+    :root {
+      --primary: #0369a1;
+      --primary-dark: #075985;
+      --primary-light: #e0f2fe;
+      --accent: #0f766e;
+      --accent-light: #ccfbf1;
+      --success: #15803d;
+      --success-light: #dcfce7;
+      --warning: #b45309;
+      --warning-light: #fef3c7;
+      --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --bkash: #e2136e;
+      --bkash-light: #fce7f0;
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10), 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 12px 28px -6px rgba(15, 23, 42, 0.14), 0 6px 12px -6px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    .navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-links a.active {
+      color: var(--primary-dark);
+      background-color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .nav-badge-ai {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: white !important;
+      font-weight: 600 !important;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Banner & Actions Header */
+    .hero-header {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      border-radius: var(--radius-md);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .hero-text h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-text p {
+      font-size: 13.5px;
+      color: #94a3b8;
+      max-width: 620px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+      text-decoration: none;
+    }
+
+    .btn-sample {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
+    }
+
+    .btn-sample:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-1px);
+    }
+
+    .btn-reset {
+      background: rgba(255, 255, 255, 0.1);
+      color: #f1f5f9;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-reset:hover {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    /* Key Metrics Grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .stat-details {
+      flex: 1;
+    }
+
+    .stat-details .label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .stat-details .value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .stat-details .sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Quick Shortcuts Grid */
+    .shortcuts-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .shortcut-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .shortcut-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      background-color: #f0f9ff;
+    }
+
+    .shortcut-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .shortcut-card h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .shortcut-card p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Two-column operational dashboard */
+    .dashboard-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 22px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-header h3 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-header a {
+      font-size: 12.5px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .card-header a:hover {
+      text-decoration: underline;
+    }
+
+    /* Tables */
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 9px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-done { background: var(--success-light); color: #047857; }
+    .badge-pending { background: var(--warning-light); color: #b45309; }
+    .badge-cash { background: #f1f5f9; color: var(--text-main); }
+    .badge-bkash { background: var(--bkash-light); color: var(--bkash); font-weight: 700; }
+    .badge-card { background: #e0f2fe; color: #0369a1; }
+
+    /* Doctor Directory Pill list */
+    .doctor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .doctor-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .doc-name { font-size: 13px; font-weight: 700; color: var(--text-main); }
+    .doc-dept { font-size: 11.5px; color: var(--primary-dark); font-weight: 600; }
+    .doc-fee { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Banner for AI Assistant */
+    .ai-callout {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      border-radius: var(--radius-md);
+      padding: 20px 26px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .ai-callout-text h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .ai-callout-text p {
+      font-size: 13px;
+      color: #e0e7ff;
+    }
+
+    .btn-ai-chat {
+      background: #ffffff;
+      color: #4f46e5;
+      font-weight: 700;
+    }
+
+    .btn-ai-chat:hover {
+      background: #f8fafc;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Modal for sample load confirm */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #fff;
+      max-width: 480px;
+      width: 100%;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 26px;
+    }
+
+    .modal-box h3 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .modal-box p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(120px);
+      transition: transform 0.25s ease-out;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #toast.show { transform: translateY(0); }
+
+    @media (max-width: 1024px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .shortcuts-grid { grid-template-columns: repeat(3, 1fr); }
+      .dashboard-two-col { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .stat-grid { grid-template-columns: 1fr; }
+      .shortcuts-grid { grid-template-columns: 1fr 1fr; }
+      .nav-container { flex-direction: column; height: auto; padding: 12px 16px; gap: 12px; }
+      .nav-links { flex-wrap: wrap; justify-content: center; width: 100%; }
+      .main-content { padding: 16px 12px; }
+      .hero-header { padding: 20px; }
+      .hero-actions { width: 100%; }
+      .hero-actions button { width: 100%; justify-content: center; }
+    }
+  
+/* ===== BOLD visual redesign — clearly visible upgrade ===== */
+/* --- page background: subtle top glow --- */
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -80px, rgba(3,105,161,.10), transparent 70%),
+    var(--bg);
+}
+/* --- hero: vibrant gradient + glow --- */
+.hero-header{
+  background:linear-gradient(115deg,#0c4a6e 0%,#0369a1 48%,#0f766e 100%) !important;
+  box-shadow:0 24px 48px -16px rgba(3,105,161,.45),0 8px 16px -8px rgba(15,118,110,.30) !important;
+  padding:40px 44px !important;
+  position:relative;
+  overflow:hidden;
+  border:none !important;
+}
+.hero-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(600px 300px at 88% 12%,rgba(255,255,255,.16),transparent 60%);
+  pointer-events:none;
+}
+.hero-header h2{
+  font-size:2rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.03em !important;
+  color:#fff !important;
+}
+.hero-header p{
+  color:rgba(255,255,255,.82) !important;
+  font-size:1.02rem !important;
+  max-width:56ch;
+}
+/* --- stat cards: accent top-bar + bigger numbers --- */
+.stat-card{
+  border:none !important;
+  border-top:5px solid var(--card-accent,var(--primary)) !important;
+  box-shadow:0 10px 24px -10px rgba(15,23,42,.14),0 4px 8px -4px rgba(15,23,42,.06) !important;
+  border-radius:16px !important;
+  padding:24px !important;
+}
+.stat-grid .stat-card:nth-child(1){--card-accent:#0284c7;}
+.stat-grid .stat-card:nth-child(2){--card-accent:#16a34a;}
+.stat-grid .stat-card:nth-child(3){--card-accent:#d97706;}
+.stat-grid .stat-card:nth-child(4){--card-accent:#7c3aed;}
+.stat-card .value{
+  font-size:2.1rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.02em;
+  color:var(--text-main);
+}
+.stat-card .label{
+  font-size:.78rem !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-icon{
+  width:52px !important;
+  height:52px !important;
+  font-size:1.6rem !important;
+  border-radius:14px !important;
+}
+/* --- navbar: premium sticky bar --- */
+.navbar{
+  box-shadow:0 4px 20px -6px rgba(15,23,42,.12) !important;
+  border-bottom:2px solid var(--primary-light) !important;
+}
+.brand-logo{
+  width:42px !important;
+  height:42px !important;
+  font-size:1.15rem !important;
+  box-shadow:0 6px 14px -4px rgba(3,105,161,.5) !important;
+}
+/* --- buttons: vibrant --- */
+.btn-sample,.btn-ai-chat{
+  background:linear-gradient(135deg,#16a34a,#15803d) !important;
+  box-shadow:0 10px 20px -8px rgba(22,163,74,.55) !important;
+  font-weight:700 !important;
+  padding:12px 22px !important;
+  border-radius:12px !important;
+}
+.btn-sample:hover,.btn-ai-chat:hover{
+  box-shadow:0 14px 26px -8px rgba(22,163,74,.65) !important;
+}
+/* --- shortcut cards: bolder --- */
+.shortcut-card{
+  border-radius:16px !important;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px -10px rgba(15,23,42,.10) !important;
+}
+.shortcut-card:hover{
+  border-color:var(--primary-light) !important;
+}
+.shortcut-icon{
+  width:56px !important;
+  height:56px !important;
+  font-size:1.7rem !important;
+  border-radius:16px !important;
+}
+/* --- section titles with accent bar --- */
+.shortcuts-title,.card-header h3{
+  position:relative;
+  padding-left:14px;
+}
+.shortcuts-title::before,.card-header h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:4px;
+  border-radius:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+/* --- tables: premium header --- */
+thead th{
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0) !important;
+  font-size:.75rem !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:14px 16px !important;
+}
+/* --- badges pop --- */
+.badge-done,.badge-pending,.badge-status{
+  font-weight:700 !important;
+  padding:5px 12px !important;
+  border-radius:999px !important;
+}
+
+/* ===== Guideline essentials (kept from polish pass) ===== */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+h1,h2,h3{text-wrap:balance;}
+.stat-card .value,.value,.metric,td,th,.amount,.doc-fee{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none !important;animation:none !important;}}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">C+</div>
+        <div class="brand-text">
+          <h1>CarePoint Hospital</h1>
+          <p>Management System</p>
+        </div>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="active"><span>🏠</span> Dashboard</a></li>
+          <li><a href="patients.html"><span>👤</span> Patients</a></li>
+          <li><a href="visits.html"><span>🩺</span> Doctor Visit</a></li>
+          <li><a href="lab.html"><span>🧪</span> Lab Tests</a></li>
+          <li><a href="billing.html"><span>💳</span> Billing</a></li>
+          <li><a href="reports.html"><span>📊</span> Reports</a></li>
+          <li><a href="chat.html" class="nav-badge-ai"><span>💬</span> AI Assistant</a></li>
+          <li><a href="settings.html"><span>⚙️</span> Settings</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    
+    <!-- Hero Header with Sample Data Trigger -->
+    <div class="hero-header">
+      <div class="hero-text">
+        <h2>Hospital Operations Overview</h2>
+        <p>Live summary of today's patient footfall, medical consultation fees, lab investigations, and collections across cash, card, and bKash.</p>
+      </div>
+      <div class="hero-actions">
+        <button type="button" class="btn btn-sample" id="btnLoadSampleData">
+          <span>📦</span> Load Sample Data (50 Patients + 1 Mo History)
+        </button>
+        <button type="button" class="btn btn-reset" id="btnResetData">
+          <span>🗑️</span> Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Today's Key Metrics (Requirement: patients, money collected, tests pending) -->
+    <div class="stat-grid">
+      <!-- 1. Total Patients Registered Today -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">👥</div>
+        <div class="stat-details">
+          <div class="label">Today's Patients</div>
+          <div class="value" id="statTodayPatients">0</div>
+          <div class="sub" id="statTotalPatientsSub">0 total registered</div>
+        </div>
+      </div>
+
+      <!-- 2. Money Collected Today -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">৳</div>
+        <div class="stat-details">
+          <div class="label">Money Collected Today</div>
+          <div class="value" style="color:#16a34a;" id="statTodayMoney">Tk 0</div>
+          <div class="sub" id="statTodayMethodBreakdown">Visits & Lab receipts</div>
+        </div>
+      </div>
+
+      <!-- 3. Tests Pending -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">⏳</div>
+        <div class="stat-details">
+          <div class="label">Tests Pending</div>
+          <div class="value" style="color:#d97706;" id="statPendingTests">0</div>
+          <div class="sub" id="statCompletedTestsSub">0 tests completed</div>
+        </div>
+      </div>
+
+      <!-- 4. Total Doctor Visits This Month -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #ede9fe; color: #7c3aed;">🩺</div>
+        <div class="stat-details">
+          <div class="label">Doctor Visits (30d)</div>
+          <div class="value" style="color:#7c3aed;" id="statTotalVisits">0</div>
+          <div class="sub" id="statActiveDoctorsSub">5 doctors active</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Shortcuts -->
+    <div class="shortcuts-title">⚡ Quick Navigation & Clinical Actions</div>
+    <div class="shortcuts-grid">
+      <a href="patients.html" class="shortcut-card">
+        <div class="shortcut-icon" style="background: #e0f2fe; color: #0284c7;">👤</div>
+        <h4>Register Patient</h4>
+        <p>Add new patient & generate ID</p>
+      </a>
+
+      <a href="visits.html" class="shortcut-card">
+        <div class="shortcut-icon" style="background: #ede9fe; color: #7c3aed;">🩺</div>
+        <h4>New Visit / Rx</h4>
+        <p>Record prescription & doc fee</p>
+      </a>
+
+      <a href="lab.html" class="shortcut-card">
+        <div class="shortcut-icon" style="background: #ccfbf1; color: #0d9488;">🧪</div>
+        <h4>Order Lab Tests</h4>
+        <p>Diagnostics, pricing & results</p>
+      </a>
+
+      <a href="billing.html" class="shortcut-card">
+        <div class="shortcut-icon" style="background: #dcfce7; color: #16a34a;">💳</div>
+        <h4>Patient Billing</h4>
+        <p>Cash, Card & bKash receipts</p>
+      </a>
+
+      <a href="reports.html" class="shortcut-card">
+        <div class="shortcut-icon" style="background: #fef3c7; color: #d97706;">📊</div>
+        <h4>Daily Reports</h4>
+        <p>Collections, doctor & lab data</p>
+      </a>
+    </div>
+
+    <!-- Operations Dual-Column: Recent Doctor Visits + Recent Lab Orders -->
+    <div class="dashboard-two-col">
+      
+      <!-- Left: Recent Consultations -->
+      <div class="card">
+        <div class="card-header">
+          <h3><span>🩺</span> Recent OPD Consultations</h3>
+          <a href="visits.html">All Visits &rarr;</a>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Date</th>
+                <th>Fee</th>
+              </tr>
+            </thead>
+            <tbody id="tableRecentVisits">
+              <tr><td colspan="4" style="text-align:center; padding:24px; color:var(--text-muted);">No visits recorded. Click "Load Sample Data" above!</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right: Recent Lab Test Orders -->
+      <div class="card">
+        <div class="card-header">
+          <h3><span>🧪</span> Diagnostic Lab Orders</h3>
+          <a href="lab.html">Manage Lab &rarr;</a>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Test</th>
+                <th>Status</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody id="tableRecentLab">
+              <tr><td colspan="4" style="text-align:center; padding:24px; color:var(--text-muted);">No lab tests ordered. Click "Load Sample Data" above!</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Active Doctor Directory -->
+    <div class="card" style="margin-bottom: 28px;">
+      <div class="card-header">
+        <h3><span>👨‍⚕️</span> Hospital Medical Faculty & Consultants (5 Doctors)</h3>
+        <span style="font-size:12px; color:var(--text-muted);">Fixed OPD consultation schedule</span>
+      </div>
+      <div class="doctor-grid" id="doctorDirectoryGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ChatterMate AI Assistant Callout -->
+    <div class="ai-callout">
+      <div class="ai-callout-text">
+        <h3>💬 ChatterMate AI Report Assistant</h3>
+        <p>Ask questions about hospital collections, doctor patient counts, pending lab tests, and balances in plain English.</p>
+      </div>
+      <a href="chat.html" class="btn btn-ai-chat">Open AI Report Chat &rarr;</a>
+    </div>
+
+  </main>
+
+  <!-- Confirm Reset Modal -->
+  <div class="modal-backdrop" id="resetModal">
+    <div class="modal-box">
+      <h3>⚠️ Reset Hospital Data?</h3>
+      <p>This will erase all registered patients, doctor visits, lab tests, and receipts from this browser's localStorage. You can regenerate the sample dataset anytime.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-reset" style="color:var(--text-main); background:#f1f5f9; border-color:var(--border);" onclick="closeResetModal()">Cancel</button>
+        <button type="button" class="btn" style="background:var(--danger); color:#fff;" id="confirmResetBtn">Yes, Clear All Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Action completed!</span>
+  </div>
+
+  <script>
+    // LocalStorage Keys
+    const KEYS = {
+      PATIENTS: 'hm_patients',
+      DOCTORS: 'hm_doctors',
+      VISITS: 'hm_visits',
+      LAB_TESTS: 'hm_lab_tests',
+      PAYMENTS: 'hm_payments',
+      RECEIPTS: 'hm_receipts'
+    };
+
+    function getData(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setData(key, val) {
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+
+    function showToast(msg, icon = '✅') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // Fixed 5 Doctors Catalog (invented names and specialties)
+    const SAMPLE_DOCTORS = [
+      { id: 'DOC-01', name: 'Dr. Farhan Rahman', specialty: 'General Medicine', fee: 800, room: 'Room 201' },
+      { id: 'DOC-02', name: 'Dr. Nusrat Jahan', specialty: 'Cardiology', fee: 1000, room: 'Room 305' },
+      { id: 'DOC-03', name: 'Dr. Tariqul Islam', specialty: 'Orthopedics', fee: 900, room: 'Room 104' },
+      { id: 'DOC-04', name: 'Dr. Sabrina Parveen', specialty: 'Gynecology & Obs', fee: 800, room: 'Room 208' },
+      { id: 'DOC-05', name: 'Dr. Asif Chowdhury', specialty: 'Pediatrics', fee: 700, room: 'Room 102' }
+    ];
+
+    // Diagnostic tests catalog
+    const LAB_CATALOG = [
+      { name: 'Complete Blood Count (CBC)', cost: 500, normal: 'Normal WBC, Hb: 13.5 g/dL' },
+      { name: 'Fasting Blood Sugar (FBS)', cost: 250, normal: '5.4 mmol/L (Normal)' },
+      { name: 'Lipid Profile', cost: 1200, normal: 'Cholesterol 185 mg/dL' },
+      { name: 'Serum Creatinine', cost: 400, normal: '0.9 mg/dL (Normal renal function)' },
+      { name: 'Urine Routine Examination', cost: 300, normal: 'No pus cells, Albumin Nil' },
+      { name: 'Chest X-Ray (P/A View)', cost: 800, normal: 'Clear lung fields, normal cardiothoracic ratio' },
+      { name: 'HbA1c (Glycated Hemoglobin)', cost: 950, normal: '5.8% (Good glycemic control)' },
+      { name: 'Liver Function Test (LFT)', cost: 1100, normal: 'SGPT: 32 U/L, Bilirubin: 0.8 mg/dL' }
+    ];
+
+    // Made-up Bangladeshi First and Last Names for 50 fake patients
+    const FIRST_NAMES = [
+      'Mohammad', 'Fatima', 'Abdul', 'Shirin', 'Tanvir', 'Nazmul', 'Ayesha', 'Kamal', 'Tahmina', 'Rashid',
+      'Rokeya', 'Mahmud', 'Salma', 'Kabir', 'Jannatul', 'Siddiqur', 'Farhana', 'Zahid', 'Anwara', 'Rafiq',
+      'Nasreen', 'Habib', 'Sultana', 'Shakil', 'Rehana', 'Imran', 'Khaleda', 'Monir', 'Mitu', 'Shahadat',
+      'Rubina', 'Arif', 'Bilkis', 'Shafiq', 'Sharmin', 'Hasnat', 'Meherun', 'Delwar', 'Ruma', 'Babul',
+      'Khadija', 'Tariq', 'Moriom', 'Anisur', 'Parul', 'Belal', 'Afroza', 'Sohail', 'Lily', 'Golam'
+    ];
+
+    const LAST_NAMES = [
+      'Ahmed', 'Chowdhury', 'Hossain', 'Akter', 'Rahman', 'Begum', 'Hasan', 'Khan', 'Khatun', 'Islam',
+      'Sarker', 'Bhuiyan', 'Uddin', 'Mia', 'Miah', 'Talukdar', 'Patwary', 'Dewan', 'Gazi', 'Barua'
+    ];
+
+    const LOCALITIES = [
+      'Dhanmondi, Dhaka', 'Mirpur-10, Dhaka', 'Uttara Sector 4, Dhaka', 'Mohakhali, Dhaka',
+      'Banani, Dhaka', 'Gulshan-2, Dhaka', 'Badda, Dhaka', 'Old Dhaka (Lalbagh)', 'Malibagh, Dhaka',
+      'Mohammadpur, Dhaka', 'Tejgaon, Dhaka', 'Khilgaon, Dhaka', 'Bashundhara R/A, Dhaka'
+    ];
+
+    const CHIEF_COMPLAINTS = [
+      { complaint: 'Persistent fever and body ache for 4 days', diagnosis: 'Viral Pyrexia' },
+      { complaint: 'Severe chest tightness and shortness of breath upon exertion', diagnosis: 'Exertional Angina / HTN' },
+      { complaint: 'Acute lower back pain radiating down right leg', diagnosis: 'Lumbar Radiculopathy' },
+      { complaint: 'Severe acid reflux and epigastric burning pain', diagnosis: 'GERD / Peptic Gastritis' },
+      { complaint: 'High-grade fever with productive cough and chills', diagnosis: 'Lower Respiratory Tract Infection' },
+      { complaint: 'Bilateral knee joint swelling and stiffness in mornings', diagnosis: 'Osteoarthritis' },
+      { complaint: 'Excessive thirst, frequent urination, and unexplained fatigue', diagnosis: 'Type 2 Diabetes Mellitus' },
+      { complaint: 'Child suffering from acute watery diarrhea and mild vomiting', diagnosis: 'Pediatric Acute Gastroenteritis' },
+      { complaint: 'Chronic headache and dizziness with elevated blood pressure', diagnosis: 'Essential Hypertension' },
+      { complaint: 'Routine prenatal follow-up; mild morning nausea', diagnosis: '2nd Trimester Routine Antenatal Care' }
+    ];
+
+    // Helper: Formats YYYY-MM-DD
+    function formatDateStr(dateObj) {
+      return dateObj.toISOString().split('T')[0];
+    }
+
+    // Helper: Get random integer between min and max (inclusive)
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // ==========================================
+    // THE 1-MONTH SAMPLE DATA GENERATOR ENGINE
+    // ==========================================
+    function generateFullSampleData() {
+      const today = new Date();
+      
+      // 1. Doctors (always 5)
+      setData(KEYS.DOCTORS, SAMPLE_DOCTORS);
+
+      // 2. Generate 50 Patients
+      const patients = [];
+      for (let i = 1; i <= 50; i++) {
+        const id = 'P-' + String(i).padStart(4, '0');
+        const firstName = FIRST_NAMES[i - 1];
+        const lastName = LAST_NAMES[randInt(0, LAST_NAMES.length - 1)];
+        const fullName = `${firstName} ${lastName}`;
+        const gender = (i % 2 === 0) ? 'Female' : 'Male';
+        const age = randInt(8, 74);
+        
+        // Fictional Bangladeshi mobile: 017xx or 018xx + 6 random digits
+        const prefix = ['01711', '01819', '01912', '01678', '01552'][randInt(0, 4)];
+        const phone = `${prefix}-${String(randInt(100000, 999999))}`;
+        const address = LOCALITIES[randInt(0, LOCALITIES.length - 1)];
+
+        // Date registered: spread randomly over past 30 days
+        const regDaysAgo = randInt(0, 29);
+        const regDateObj = new Date(today);
+        regDateObj.setDate(regDateObj.getDate() - regDaysAgo);
+        const regDate = formatDateStr(regDateObj);
+
+        patients.push({
+          id,
+          name: fullName,
+          age,
+          gender,
+          phone,
+          address,
+          regDate: regDate,
+          createdAt: regDateObj.toISOString()
+        });
+      }
+      setData(KEYS.PATIENTS, patients);
+
+      // 3. Generate Visits (~80-90 visits over 30 days)
+      const visits = [];
+      let visitCounter = 1001;
+
+      for (let dayOffset = 29; dayOffset >= 0; dayOffset--) {
+        const currentDateObj = new Date(today);
+        currentDateObj.setDate(currentDateObj.getDate() - dayOffset);
+        const dateStr = formatDateStr(currentDateObj);
+
+        // Daily visits: between 2 and 5 visits per day
+        const visitsToday = randInt(2, 5);
+
+        for (let k = 0; k < visitsToday; k++) {
+          const patient = patients[randInt(0, patients.length - 1)];
+          const doctor = SAMPLE_DOCTORS[randInt(0, SAMPLE_DOCTORS.length - 1)];
+          const clinicalCase = CHIEF_COMPLAINTS[randInt(0, CHIEF_COMPLAINTS.length - 1)];
+
+          visits.push({
+            id: 'VIS-' + String(visitCounter++),
+            patientId: patient.id,
+            patientName: patient.name,
+            doctorId: doctor.id,
+            doctorName: doctor.name,
+            doctorSpecialty: doctor.specialty,
+            fee: doctor.fee,
+            date: dateStr,
+            complaint: clinicalCase.complaint,
+            diagnosis: clinicalCase.diagnosis,
+            medicines: [
+              { name: 'Tab. Paracetamol 500mg', dosage: '1+1+1', duration: '5 days' },
+              { name: 'Cap. Omeprazole 20mg', dosage: '1+0+1 (Before meals)', duration: '14 days' }
+            ],
+            createdAt: currentDateObj.toISOString()
+          });
+        }
+      }
+      setData(KEYS.VISITS, visits);
+
+      // 4. Generate Lab Tests (~60-70 tests over 30 days)
+      const labTests = [];
+      let labCounter = 5001;
+
+      for (let dayOffset = 29; dayOffset >= 0; dayOffset--) {
+        const currentDateObj = new Date(today);
+        currentDateObj.setDate(currentDateObj.getDate() - dayOffset);
+        const dateStr = formatDateStr(currentDateObj);
+
+        const testsToday = randInt(1, 4);
+
+        for (let m = 0; m < testsToday; m++) {
+          const patient = patients[randInt(0, patients.length - 1)];
+          const testItem = LAB_CATALOG[randInt(0, LAB_CATALOG.length - 1)];
+
+          // Tests from today or yesterday have a higher chance of being pending
+          const isPending = (dayOffset === 0 && Math.random() > 0.4) || (dayOffset === 1 && Math.random() > 0.75);
+          const status = isPending ? 'pending' : 'done';
+
+          labTests.push({
+            id: 'LAB-' + String(labCounter++),
+            patientId: patient.id,
+            patientName: patient.name,
+            testName: testItem.name,
+            cost: testItem.cost,
+            date: dateStr,
+            status: status,
+            results: status === 'done' ? testItem.normal : '',
+            createdAt: currentDateObj.toISOString()
+          });
+        }
+      }
+      setData(KEYS.LAB_TESTS, labTests);
+
+      // 5. Generate Payment Receipts (Cash, Card, bKash)
+      const receipts = [];
+      const payments = [];
+      let recCounter = 8001;
+
+      // Group billed items per patient to create realistic receipts
+      const paymentMethods = ['Cash', 'bKash', 'Card'];
+
+      for (let dayOffset = 29; dayOffset >= 0; dayOffset--) {
+        const currentDateObj = new Date(today);
+        currentDateObj.setDate(currentDateObj.getDate() - dayOffset);
+        const dateStr = formatDateStr(currentDateObj);
+
+        // Find visits and tests that happened on or before this day
+        const dayVisits = visits.filter(v => v.date === dateStr);
+        const dayTests = labTests.filter(t => t.date === dateStr);
+
+        // Create payments for ~85% of items (leaving realistic unpaid dues)
+        dayVisits.forEach(v => {
+          if (Math.random() < 0.85) {
+            const method = paymentMethods[randInt(0, paymentMethods.length - 1)];
+            const receiptId = 'REC-' + String(recCounter++);
+            const trxId = method === 'bKash' ? 'TRX' + randInt(10000000, 99999999) : (method === 'Card' ? 'AUTH-' + randInt(1000, 9999) : '');
+
+            const rec = {
+              id: receiptId,
+              patientId: v.patientId,
+              patientName: v.patientName,
+              amount: v.fee,
+              method: method,
+              reference: trxId,
+              notes: `OPD Consultation fee (${v.doctorName})`,
+              date: dateStr,
+              prevDue: v.fee,
+              remainingDue: 0,
+              createdAt: currentDateObj.toISOString()
+            };
+            receipts.push(rec);
+            payments.push({
+              id: receiptId,
+              patientId: v.patientId,
+              type: 'visit',
+              amount: v.fee,
+              total: v.fee,
+              paid: v.fee,
+              due: 0,
+              method: method,
+              date: dateStr
+            });
+          }
+        });
+
+        dayTests.forEach(t => {
+          if (Math.random() < 0.80) {
+            const method = paymentMethods[randInt(0, paymentMethods.length - 1)];
+            const receiptId = 'REC-' + String(recCounter++);
+            const trxId = method === 'bKash' ? 'TRX' + randInt(10000000, 99999999) : '';
+
+            const rec = {
+              id: receiptId,
+              patientId: t.patientId,
+              patientName: t.patientName,
+              amount: t.cost,
+              method: method,
+              reference: trxId,
+              notes: `Diagnostic Lab: ${t.testName}`,
+              date: dateStr,
+              prevDue: t.cost,
+              remainingDue: 0,
+              createdAt: currentDateObj.toISOString()
+            };
+            receipts.push(rec);
+            payments.push({
+              id: receiptId,
+              patientId: t.patientId,
+              type: 'lab',
+              amount: t.cost,
+              total: t.cost,
+              paid: t.cost,
+              due: 0,
+              method: method,
+              date: dateStr
+            });
+          }
+        });
+      }
+
+      setData(KEYS.RECEIPTS, receipts);
+      setData(KEYS.PAYMENTS, payments);
+
+      return {
+        patientCount: patients.length,
+        doctorCount: SAMPLE_DOCTORS.length,
+        visitCount: visits.length,
+        labCount: labTests.length,
+        receiptCount: receipts.length
+      };
+    }
+
+    // ==========================================
+    // RENDER DASHBOARD METRICS & RECENT TABLES
+    // ==========================================
+    function updateDashboard() {
+      const todayStr = formatDateStr(new Date());
+
+      const patients = getData(KEYS.PATIENTS);
+      const doctors = getData(KEYS.DOCTORS).length ? getData(KEYS.DOCTORS) : SAMPLE_DOCTORS;
+      const visits = getData(KEYS.VISITS);
+      const labTests = getData(KEYS.LAB_TESTS);
+      const receipts = getData(KEYS.RECEIPTS);
+
+      // 1. Patients registered today & total
+      const patientsToday = patients.filter(p => p.regDate === todayStr).length;
+      document.getElementById('statTodayPatients').textContent = patientsToday;
+      document.getElementById('statTotalPatientsSub').textContent = `${patients.length} total registered patients`;
+
+      // 2. Money collected today
+      const receiptsToday = receipts.filter(r => r.date === todayStr);
+      const todayCollected = receiptsToday.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+      document.getElementById('statTodayMoney').textContent = `Tk ${todayCollected.toLocaleString()}`;
+      
+      const cashToday = receiptsToday.filter(r => r.method === 'Cash').reduce((s, r) => s + (Number(r.amount) || 0), 0);
+      const bkashToday = receiptsToday.filter(r => r.method === 'bKash').reduce((s, r) => s + (Number(r.amount) || 0), 0);
+      document.getElementById('statTodayMethodBreakdown').textContent = `Cash: Tk ${cashToday.toLocaleString()} · bKash: Tk ${bkashToday.toLocaleString()}`;
+
+      // 3. Tests pending vs done
+      const pendingTests = labTests.filter(t => t.status === 'pending').length;
+      const doneTests = labTests.filter(t => t.status === 'done').length;
+      document.getElementById('statPendingTests').textContent = pendingTests;
+      document.getElementById('statCompletedTestsSub').textContent = `${doneTests} diagnostics completed`;
+
+      // 4. Visits over past 30 days
+      document.getElementById('statTotalVisits').textContent = visits.length;
+      document.getElementById('statActiveDoctorsSub').textContent = `${doctors.length} faculty consultants`;
+
+      // Render Doctor Directory
+      renderDoctors(doctors);
+
+      // Render Recent 5 Visits
+      renderRecentVisits(visits);
+
+      // Render Recent 5 Lab Tests
+      renderRecentLab(labTests);
+    }
+
+    function renderDoctors(doctors) {
+      const grid = document.getElementById('doctorDirectoryGrid');
+      grid.innerHTML = doctors.map(doc => `
+        <div class="doctor-card">
+          <div class="doc-name">${doc.name}</div>
+          <div class="doc-dept">${doc.specialty} (${doc.room || 'OPD'})</div>
+          <div class="doc-fee">Consultation Fee: <strong>Tk ${doc.fee}</strong></div>
+        </div>
+      `).join('');
+    }
+
+    function renderRecentVisits(visits) {
+      const tbody = document.getElementById('tableRecentVisits');
+      const recent = [...visits].reverse().slice(0, 5);
+
+      if (recent.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:24px; color:var(--text-muted);">No visits recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = recent.map(v => `
+        <tr>
+          <td><strong>${v.patientName}</strong><div style="font-size:11px; color:var(--text-muted);">${v.patientId}</div></td>
+          <td>${v.doctorName}<div style="font-size:11px; color:var(--text-muted);">${v.doctorSpecialty}</div></td>
+          <td>${v.date}</td>
+          <td><strong style="color:var(--primary-dark);">Tk ${v.fee}</strong></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderRecentLab(labTests) {
+      const tbody = document.getElementById('tableRecentLab');
+      const recent = [...labTests].reverse().slice(0, 5);
+
+      if (recent.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:24px; color:var(--text-muted);">No lab tests recorded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = recent.map(t => `
+        <tr>
+          <td><strong>${t.patientName}</strong><div style="font-size:11px; color:var(--text-muted);">${t.patientId}</div></td>
+          <td>${t.testName}</td>
+          <td>
+            <span class="badge-status ${t.status === 'done' ? 'badge-done' : 'badge-pending'}">
+              ${t.status === 'done' ? '✓ Done' : '⏳ Pending'}
+            </span>
+          </td>
+          <td><strong>Tk ${t.cost}</strong></td>
+        </tr>
+      `).join('');
+    }
+
+    // ==========================================
+    // BUTTON HANDLERS
+    // ==========================================
+    document.getElementById('btnLoadSampleData').addEventListener('click', function() {
+      const btn = this;
+      btn.disabled = true;
+      btn.textContent = 'Generating sample dataset...';
+
+      setTimeout(() => {
+        const stats = generateFullSampleData();
+        updateDashboard();
+        btn.disabled = false;
+        btn.innerHTML = '<span>📦</span> Reload Sample Data';
+        showToast(`Loaded ${stats.patientCount} patients, ${stats.doctorCount} doctors, ${stats.visitCount} visits, ${stats.labCount} lab tests & ${stats.receiptCount} receipts!`, '🎉');
+      }, 300);
+    });
+
+    const resetModal = document.getElementById('resetModal');
+    document.getElementById('btnResetData').addEventListener('click', function() {
+      resetModal.style.display = 'flex';
+    });
+
+    window.closeResetModal = function() {
+      resetModal.style.display = 'none';
+    };
+
+    document.getElementById('confirmResetBtn').addEventListener('click', function() {
+      Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+      closeResetModal();
+      updateDashboard();
+      showToast('All hospital data has been cleared from browser memory.', '🗑️');
+    });
+
+    // Auto-check on initial load: if no data exists, suggest or auto-init doctors
+    window.addEventListener('DOMContentLoaded', () => {
+      if (getData(KEYS.DOCTORS).length === 0) {
+        setData(KEYS.DOCTORS, SAMPLE_DOCTORS);
+      }
+      updateDashboard();
+    });
+  </script>
+</body>
+</html>

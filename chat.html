@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint Hospital - AI Report Assistant</title>
+  <style>
+    :root {
+      --primary: #0369a1;
+      --primary-dark: #075985;
+      --primary-light: #e0f2fe;
+      --accent: #0ea5e9;
+      --surface: #ffffff;
+      --bg: #eef2f7;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --user-bubble: #0284c7;
+      --ai-bubble: #ffffff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --sidebar-w: 240px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: white;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .nav-group {
+      padding: 20px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #64748b;
+      padding: 8px 12px 4px;
+      font-weight: 600;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      color: #cbd5e1;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .nav-link:hover {
+      background: #1e293b;
+      color: #fff;
+    }
+
+    .nav-link.active {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Main Content Area */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .chat-topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+
+    .powered-by {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .powered-tag {
+      font-weight: 700;
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Chat layout container */
+    .chat-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      overflow: hidden;
+    }
+
+    /* Chat Messages Pane */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #f1f5f9;
+      position: relative;
+    }
+
+    .messages-pane {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 80%;
+      animation: fadeIn 0.2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .message.user .avatar {
+      background: #0369a1;
+      color: white;
+    }
+
+    .message.assistant .avatar {
+      background: #0f172a;
+      color: #38bdf8;
+      border: 1px solid #334155;
+    }
+
+    .bubble {
+      padding: 14px 18px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      word-wrap: break-word;
+    }
+
+    .message.user .bubble {
+      background: var(--user-bubble);
+      color: #ffffff;
+      border-top-right-radius: 3px;
+    }
+
+    .message.assistant .bubble {
+      background: var(--ai-bubble);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-top-left-radius: 3px;
+    }
+
+    /* Markdown styling inside bubble */
+    .bubble strong, .bubble b {
+      font-weight: 700;
+      color: inherit;
+    }
+
+    .message.assistant .bubble strong {
+      color: #0369a1;
+    }
+
+    .bubble ul, .bubble ol {
+      padding-left: 20px;
+      margin: 6px 0;
+    }
+
+    .bubble li {
+      margin-bottom: 4px;
+    }
+
+    .bubble p + p {
+      margin-top: 8px;
+    }
+
+    .msg-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .message.user .msg-meta {
+      color: #e2e8f0;
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      gap: 5px;
+      padding: 12px 18px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      width: fit-content;
+      align-items: center;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: pulse 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+      40% { transform: scale(1.1); opacity: 1; background: var(--primary); }
+    }
+
+    /* Input Dock */
+    .input-dock {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 18px 24px;
+    }
+
+    .input-form {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .input-field {
+      flex: 1;
+      padding: 14px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #fff;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    .send-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      background: var(--primary-dark);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Right Side Assistant Inspector */
+    .inspector {
+      background: #ffffff;
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .inspector h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .quick-chips {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .chip-btn {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      color: #334155;
+      text-align: left;
+      cursor: pointer;
+      line-height: 1.4;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .chip-btn:hover {
+      background: var(--primary-light);
+      border-color: #7dd3fc;
+      color: var(--primary-dark);
+    }
+
+    .data-summary-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 12px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+    }
+
+    .summary-label {
+      color: var(--text-muted);
+    }
+
+    .summary-value {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .data-pill {
+      font-size: 11px;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .server-status-box {
+      font-size: 12px;
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .endpoint-code {
+      font-family: monospace;
+      font-size: 11px;
+      background: #0f172a;
+      color: #38bdf8;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 992px) {
+      .chat-layout {
+        grid-template-columns: 1fr;
+      }
+      .inspector {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .main {
+        margin-left: 0;
+      }
+      .messages-pane {
+        padding: 16px;
+      }
+      .message {
+        max-width: 90%;
+      }
+    }
+  
+/* ===== BOLD visual redesign — clearly visible upgrade ===== */
+/* --- page background: subtle top glow --- */
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -80px, rgba(3,105,161,.10), transparent 70%),
+    var(--bg);
+}
+/* --- hero: vibrant gradient + glow --- */
+.hero-header{
+  background:linear-gradient(115deg,#0c4a6e 0%,#0369a1 48%,#0f766e 100%) !important;
+  box-shadow:0 24px 48px -16px rgba(3,105,161,.45),0 8px 16px -8px rgba(15,118,110,.30) !important;
+  padding:40px 44px !important;
+  position:relative;
+  overflow:hidden;
+  border:none !important;
+}
+.hero-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(600px 300px at 88% 12%,rgba(255,255,255,.16),transparent 60%);
+  pointer-events:none;
+}
+.hero-header h2{
+  font-size:2rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.03em !important;
+  color:#fff !important;
+}
+.hero-header p{
+  color:rgba(255,255,255,.82) !important;
+  font-size:1.02rem !important;
+  max-width:56ch;
+}
+/* --- stat cards: accent top-bar + bigger numbers --- */
+.stat-card{
+  border:none !important;
+  border-top:5px solid var(--card-accent,var(--primary)) !important;
+  box-shadow:0 10px 24px -10px rgba(15,23,42,.14),0 4px 8px -4px rgba(15,23,42,.06) !important;
+  border-radius:16px !important;
+  padding:24px !important;
+}
+.stat-grid .stat-card:nth-child(1){--card-accent:#0284c7;}
+.stat-grid .stat-card:nth-child(2){--card-accent:#16a34a;}
+.stat-grid .stat-card:nth-child(3){--card-accent:#d97706;}
+.stat-grid .stat-card:nth-child(4){--card-accent:#7c3aed;}
+.stat-card .value{
+  font-size:2.1rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.02em;
+  color:var(--text-main);
+}
+.stat-card .label{
+  font-size:.78rem !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-icon{
+  width:52px !important;
+  height:52px !important;
+  font-size:1.6rem !important;
+  border-radius:14px !important;
+}
+/* --- navbar: premium sticky bar --- */
+.navbar{
+  box-shadow:0 4px 20px -6px rgba(15,23,42,.12) !important;
+  border-bottom:2px solid var(--primary-light) !important;
+}
+.brand-logo{
+  width:42px !important;
+  height:42px !important;
+  font-size:1.15rem !important;
+  box-shadow:0 6px 14px -4px rgba(3,105,161,.5) !important;
+}
+/* --- buttons: vibrant --- */
+.btn-sample,.btn-ai-chat{
+  background:linear-gradient(135deg,#16a34a,#15803d) !important;
+  box-shadow:0 10px 20px -8px rgba(22,163,74,.55) !important;
+  font-weight:700 !important;
+  padding:12px 22px !important;
+  border-radius:12px !important;
+}
+.btn-sample:hover,.btn-ai-chat:hover{
+  box-shadow:0 14px 26px -8px rgba(22,163,74,.65) !important;
+}
+/* --- shortcut cards: bolder --- */
+.shortcut-card{
+  border-radius:16px !important;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px -10px rgba(15,23,42,.10) !important;
+}
+.shortcut-card:hover{
+  border-color:var(--primary-light) !important;
+}
+.shortcut-icon{
+  width:56px !important;
+  height:56px !important;
+  font-size:1.7rem !important;
+  border-radius:16px !important;
+}
+/* --- section titles with accent bar --- */
+.shortcuts-title,.card-header h3{
+  position:relative;
+  padding-left:14px;
+}
+.shortcuts-title::before,.card-header h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:4px;
+  border-radius:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+/* --- tables: premium header --- */
+thead th{
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0) !important;
+  font-size:.75rem !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:14px 16px !important;
+}
+/* --- badges pop --- */
+.badge-done,.badge-pending,.badge-status{
+  font-weight:700 !important;
+  padding:5px 12px !important;
+  border-radius:999px !important;
+}
+
+/* ===== Guideline essentials (kept from polish pass) ===== */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+h1,h2,h3{text-wrap:balance;}
+.stat-card .value,.value,.metric,td,th,.amount,.doc-fee{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none !important;animation:none !important;}}
+
+</style>
+</head>
+<body>
+
+  <!-- Left Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-icon">CP</div>
+      <div>
+        <div class="brand-title">CarePoint</div>
+        <div class="brand-sub">Hospital Management</div>
+      </div>
+    </div>
+    <div class="nav-group">
+      <span class="nav-label">Main Menu</span>
+      <a href="index.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+      <a href="patients.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+        Patient Reg.
+      </a>
+      <a href="visits.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-3-3v6m-7 7h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Prescriptions
+      </a>
+      <a href="lab.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+        Lab Tests
+      </a>
+      <a href="billing.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Billing
+      </a>
+
+      <span class="nav-label" style="margin-top: 14px;">Analytics</span>
+      <a href="reports.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Daily Collection
+      </a>
+      <a href="report-patients.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Patient List
+      </a>
+      <a href="report-doctors.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        Doctor Report
+      </a>
+      <a href="report-lab.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        Lab Report
+      </a>
+
+      <span class="nav-label" style="margin-top: 14px;">Smart Tools</span>
+      <a href="chat.html" class="nav-link active">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        AI Report Chat
+      </a>
+      <a href="settings.html" class="nav-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Settings
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Work Area -->
+  <main class="main">
+    <header class="chat-topbar">
+      <div class="chat-topbar-title">
+        <h2 style="font-size: 18px; font-weight: 700;">AI Hospital Report Assistant</h2>
+        <span class="badge-live"><span class="dot"></span> Online</span>
+      </div>
+      <div class="powered-by">
+        Backend: <span class="endpoint-code">POST /ask</span>
+        <span class="powered-tag">Powered by ChatterMate</span>
+      </div>
+    </header>
+
+    <div class="chat-layout">
+      <!-- Chat Interface -->
+      <section class="chat-container">
+        <div class="messages-pane" id="messagesPane">
+          <!-- Initial Welcome Message from Assistant -->
+          <div class="message assistant">
+            <div class="avatar">AI</div>
+            <div>
+              <div class="bubble">
+                Hello! I am your <strong>Hospital Report Assistant</strong>. Ask me anything about your patients, doctor visits, lab tests, and cash collections. I will inspect your live records and give you exact figures in <strong>Taka (Tk)</strong>.
+              </div>
+              <div class="msg-meta">Just now</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="input-dock">
+          <form class="input-form" id="chatForm">
+            <input 
+              type="text" 
+              id="questionInput" 
+              class="input-field" 
+              placeholder="Ask about collections, doctor visits, pending tests, or balances…" 
+              autocomplete="off" 
+              required
+            />
+            <button type="submit" class="send-btn" id="sendBtn">
+              <span>Send</span>
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right Column: Inspector & Quick Queries -->
+      <aside class="inspector">
+        <div>
+          <h3>Quick Questions</h3>
+          <div class="quick-chips">
+            <button class="chip-btn" data-query="How much did we collect today?">
+              💰 How much did we collect today?
+            </button>
+            <button class="chip-btn" data-query="Which doctor had the most visits this month?">
+              👨‍⚕️ Which doctor had the most visits this month?
+            </button>
+            <button class="chip-btn" data-query="How many lab tests are still pending?">
+              🧪 How many lab tests are still pending?
+            </button>
+            <button class="chip-btn" data-query="How many new patients came this week?">
+              🏥 How many new patients came this week?
+            </button>
+            <button class="chip-btn" data-query="Who still owes money and what is the total due?">
+              💳 Who still owes money?
+            </button>
+            <button class="chip-btn" data-query="Delete patient P-0042">
+              🛡️ Test security: Delete patient P-0042
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <h3>Live Report Context</h3>
+          <div class="data-summary-card" id="contextSummary">
+            <div class="summary-row">
+              <span class="summary-label">Total Patients:</span>
+              <span class="summary-value" id="cntPatients">0</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Visits Logged:</span>
+              <span class="summary-value" id="cntVisits">0</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Lab Orders:</span>
+              <span class="summary-value" id="cntLabs">0</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Total Collected:</span>
+              <span class="summary-value" id="cntCollected">Tk 0</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Outstanding Due:</span>
+              <span class="summary-value" id="cntDue">Tk 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="server-status-box">
+          <strong style="color: #0f172a;">Local Bridge Status:</strong>
+          <span style="color: #64748b; font-size: 11.5px;">Communicates via local Node server:</span>
+          <span class="endpoint-code">http://localhost:3000/ask</span>
+          <span style="font-size: 11px; color: #64748b; margin-top: 4px;">Runs with zero browser API exposure [1][2].</span>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // --- Markdown to HTML formatter (Converts **text** to real <strong>text</strong>) ---
+    function renderMarkdownToHtml(text) {
+      if (!text) return '';
+      
+      // Escape basic HTML entities to avoid XSS injections
+      let escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      // Replace bold syntax **text** or __text__ with <strong>text</strong>
+      escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      escaped = escaped.replace(/__(.*?)__/g, '<strong>$1</strong>');
+
+      // Replace single star *text* or _text_ with <em>text</em>
+      escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      escaped = escaped.replace(/_(.*?)_/g, '<em>$1</em>');
+
+      // Replace newline breaks with <br>
+      escaped = escaped.replace(/\n/g, '<br>');
+
+      return escaped;
+    }
+
+    // --- Helper to parse data from localStorage safely ---
+    function getStoredData(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : [];
+      } catch (err) {
+        console.error('Error reading localStorage for key: ' + key, err);
+        return [];
+      }
+    }
+
+    // --- Aggregate and compile hospital data from localStorage ---
+    function gatherHospitalReportData() {
+      // NOTE: keys must match the rest of the site (index/patients/visits/lab/billing pages)
+      const patients = getStoredData('hm_patients');
+      const visits = getStoredData('hm_visits');
+      const labTests = getStoredData('hm_lab_tests').map(l => Object.assign({}, l, {
+        price: l.price || l.cost, result: l.result || l.results || 'Pending'
+      }));
+      const payments = getStoredData('hm_payments');
+      // bills are tracked inside payment receipts (total/paid/due per receipt)
+      const bills = payments.map(p => ({
+        patientId: p.patientId, totalAmount: p.total, paid: p.paid, due: p.due
+      }));
+
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      // 1. Calculate today's collections
+      const todayPayments = payments.filter(p => (p.date || '').startsWith(todayStr));
+      const todayTotalCollected = todayPayments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+      const todayVisitPaid = todayPayments.filter(p => (p.type || '').toLowerCase().includes('visit'))
+                                         .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+      const todayLabPaid = todayPayments.filter(p => (p.type || '').toLowerCase().includes('lab'))
+                                       .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+
+      // 2. Calculate overall financials
+      const allPaymentsTotal = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+      const totalBilled = bills.reduce((sum, b) => sum + Number(b.totalAmount || b.total || 0), 0);
+      const totalDue = bills.reduce((sum, b) => sum + Number(b.due || (b.totalAmount - (b.paid || 0)) || 0), 0);
+
+      // 3. Lab Test statistics
+      const pendingLabs = labTests.filter(t => (t.status || '').toLowerCase() === 'pending').length;
+      const doneLabs = labTests.filter(t => (t.status || '').toLowerCase() === 'done').length;
+
+      // 4. Doctor visit breakdowns
+      const doctorVisitCounts = {};
+      visits.forEach(v => {
+        const docName = v.doctorName || v.doctor || 'Unknown Doctor';
+        doctorVisitCounts[docName] = (doctorVisitCounts[docName] || 0) + 1;
+      });
+
+      // 5. Patients registered recently (last 7 days)
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const recentPatients = patients.filter(p => new Date(p.registeredAt || p.createdAt || p.date || todayStr) >= oneWeekAgo);
+
+      // Return concise yet comprehensive structured JSON for ChatterMate AI prompt
+      return {
+        summary: {
+          current_date: todayStr,
+          currency: "Taka (Tk)",
+          total_patients_count: patients.length,
+          recent_new_patients_last_7_days: recentPatients.length,
+          total_visits_count: visits.length,
+          total_lab_tests_ordered: labTests.length,
+          pending_lab_tests_count: pendingLabs,
+          completed_lab_tests_count: doneLabs,
+          today_financials: {
+            total_collected_today: todayTotalCollected,
+            collected_from_doctor_visits: todayVisitPaid,
+            collected_from_lab_tests: todayLabPaid
+          },
+          overall_financials: {
+            total_billed: totalBilled,
+            total_collected: allPaymentsTotal,
+            total_outstanding_due: totalDue
+          },
+          visits_per_doctor: doctorVisitCounts
+        },
+        patients: patients.map(p => ({
+          id: p.id,
+          name: p.name,
+          age: p.age,
+          gender: p.gender || p.sex,
+          phone: p.phone,
+          registered_date: p.registeredAt || p.date
+        })),
+        recent_visits: visits.slice(-30).map(v => ({
+          patient_id: v.patientId,
+          patient_name: v.patientName,
+          doctor_name: v.doctorName,
+          date: v.date,
+          fee: v.fee
+        })),
+        recent_lab_tests: labTests.slice(-30).map(l => ({
+          test_name: l.testName || l.name,
+          patient_name: l.patientName,
+          date: l.date,
+          status: l.status,
+          price: l.price || l.fee,
+          result: l.result || "Pending"
+        })),
+        unpaid_bills: bills.filter(b => Number(b.due || (b.totalAmount - (b.paid || 0))) > 0).map(b => ({
+          patient_id: b.patientId,
+          patient_name: b.patientName,
+          total: b.totalAmount || b.total,
+          paid: b.paid || 0,
+          due: b.due || (b.totalAmount - (b.paid || 0))
+        }))
+      };
+    }
+
+    // --- Update Inspector Sidebar Numbers ---
+    function refreshInspectorNumbers() {
+      const data = gatherHospitalReportData();
+      document.getElementById('cntPatients').textContent = data.summary.total_patients_count;
+      document.getElementById('cntVisits').textContent = data.summary.total_visits_count;
+      document.getElementById('cntLabs').textContent = `${data.summary.total_lab_tests_ordered} (${data.summary.pending_lab_tests_count} pending)`;
+      document.getElementById('cntCollected').textContent = `Tk ${data.summary.overall_financials.total_collected.toLocaleString()}`;
+      document.getElementById('cntDue').textContent = `Tk ${data.summary.overall_financials.total_outstanding_due.toLocaleString()}`;
+    }
+
+    // --- Append message to chat pane ---
+    function appendMessage(sender, text, rawHtml = false) {
+      const pane = document.getElementById('messagesPane');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${sender}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = sender === 'user' ? 'YOU' : 'AI';
+
+      const contentWrap = document.createElement('div');
+
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+
+      if (rawHtml) {
+        bubble.innerHTML = text;
+      } else {
+        // Convert Markdown formatting (like **bold**) to real bold tags
+        bubble.innerHTML = renderMarkdownToHtml(text);
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+      meta.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      contentWrap.appendChild(bubble);
+      contentWrap.appendChild(meta);
+
+      msgDiv.appendChild(avatar);
+      msgDiv.appendChild(contentWrap);
+
+      pane.appendChild(msgDiv);
+      pane.scrollTop = pane.scrollHeight;
+
+      return msgDiv;
+    }
+
+    // --- Show typing animation ---
+    function showTypingIndicator() {
+      const pane = document.getElementById('messagesPane');
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'message assistant';
+      typingDiv.id = 'activeTypingIndicator';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = 'AI';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'typing-indicator';
+      bubble.innerHTML = `
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      `;
+
+      typingDiv.appendChild(avatar);
+      typingDiv.appendChild(bubble);
+      pane.appendChild(typingDiv);
+      pane.scrollTop = pane.scrollHeight;
+    }
+
+    // --- Remove typing animation ---
+    function removeTypingIndicator() {
+      const indicator = document.getElementById('activeTypingIndicator');
+      if (indicator) {
+        indicator.remove();
+      }
+    }
+
+    // --- Ask Question to local server.js endpoint POST /ask ---
+    async function submitQuestion(question) {
+      if (!question || !question.trim()) return;
+
+      const trimmedQuestion = question.trim();
+      const input = document.getElementById('questionInput');
+      const sendBtn = document.getElementById('sendBtn');
+
+      // 1. Render User Message
+      appendMessage('user', trimmedQuestion);
+      input.value = '';
+      input.disabled = true;
+      sendBtn.disabled = true;
+
+      // 2. Show Typing Indicator
+      showTypingIndicator();
+
+      // 3. Compile report data snapshot from localStorage
+      const reportPayload = gatherHospitalReportData();
+
+      try {
+        // POST to local Node backend (server.js) as mandated by Step 3.
+        // Settings-page key (if saved) travels as a header and wins over .env.
+        const savedKey = localStorage.getItem('carepoint_api_key') || '';
+        const response = await fetch('/ask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(savedKey ? { 'X-API-Key': savedKey } : {})
+          },
+          body: JSON.stringify({
+            question: trimmedQuestion,
+            data: reportPayload
+          })
+        });
+
+        removeTypingIndicator();
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          const errMsg = errData.error || `Server responded with status ${response.status}`;
+          appendMessage('assistant', `⚠️ **Error communicating with AI assistant:** ${errMsg}. Ensure \`server.js\` is running with your ChatterMate key.`);
+          return;
+        }
+
+        const resJson = await response.json();
+        const answer = resJson.answer || "I could not generate an answer from the provided data.";
+
+        // Append assistant response with real bolding rendered
+        appendMessage('assistant', answer);
+
+      } catch (error) {
+        removeTypingIndicator();
+        console.error('Fetch error:', error);
+        appendMessage('assistant', `⚠️ **Connection Failed:** Could not reach \`http://localhost:3000/ask\`. Please make sure you have started your local server using: <br><br><code>node --env-file=.env server.js</code>`);
+      } finally {
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    // --- DOM Setup & Event Listeners ---
+    document.addEventListener('DOMContentLoaded', () => {
+      refreshInspectorNumbers();
+
+      // Form submit handler
+      const form = document.getElementById('chatForm');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('questionInput');
+        submitQuestion(input.value);
+      });
+
+      // Quick question chips click handler
+      document.querySelectorAll('.chip-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const query = btn.getAttribute('data-query');
+          submitQuestion(query);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

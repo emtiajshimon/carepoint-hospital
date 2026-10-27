@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint Hospital - Billing & Invoicing</title>
+  <style>
+    :root {
+      --primary: #0369a1;
+      --primary-dark: #075985;
+      --primary-light: #e0f2fe;
+      --accent: #0f766e;
+      --accent-light: #ccfbf1;
+      --success: #15803d;
+      --success-light: #dcfce7;
+      --warning: #b45309;
+      --warning-light: #fef3c7;
+      --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --bkash: #e2136e;
+      --bkash-light: #fce7f0;
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10), 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 12px 28px -6px rgba(15, 23, 42, 0.14), 0 6px 12px -6px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-links a.active {
+      color: var(--primary-dark);
+      background-color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .nav-badge-ai {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: white !important;
+      font-weight: 600 !important;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title h2 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .page-title p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    /* Stat Cards */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .stat-meta h3 {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .stat-meta p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Billing Grid */
+    .billing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Patient Search & Picker */
+    .patient-picker-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .search-input-wrap {
+      position: relative;
+    }
+
+    .search-input-wrap input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+    }
+
+    .search-input-wrap .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .patient-suggestions {
+      margin-top: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+
+    .patient-suggestion-item {
+      padding: 9px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .patient-suggestion-item:hover {
+      background-color: var(--primary-light);
+    }
+
+    .selected-patient-card {
+      display: none;
+      background: var(--primary-light);
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-top: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .patient-meta-name {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 14px;
+    }
+
+    .patient-meta-sub {
+      font-size: 12px;
+      color: #0369a1;
+      margin-top: 2px;
+    }
+
+    .btn-clear-patient {
+      background: none;
+      border: none;
+      color: #0369a1;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    /* Balance Summary Card */
+    .balance-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .balance-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      text-align: center;
+    }
+
+    .balance-item {
+      padding: 10px;
+      background: #fff;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .balance-item .lbl {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .balance-item .val {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .val-total { color: var(--text-main); }
+    .val-paid { color: var(--success); }
+    .val-due { color: var(--danger); }
+
+    /* Payment Methods Options */
+    .payment-methods {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .method-radio-label {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      background: #fff;
+    }
+
+    .method-radio-label:hover {
+      border-color: var(--primary);
+      background: #f0f9ff;
+    }
+
+    .method-radio-label.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .method-radio-label.bkash-selected {
+      border-color: var(--bkash);
+      background: var(--bkash-light);
+      color: var(--bkash);
+    }
+
+    .method-radio-label input {
+      display: none;
+    }
+
+    .method-icon {
+      font-size: 20px;
+    }
+
+    /* Form Fields */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .input-field, select {
+      padding: 10px 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text-main);
+    }
+
+    .input-field:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    .input-with-currency {
+      position: relative;
+    }
+
+    .input-with-currency span {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .input-with-currency input {
+      padding-left: 38px;
+      width: 100%;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .quick-amount-tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .quick-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      background: #e2e8f0;
+      color: var(--text-main);
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+    }
+
+    .quick-tag:hover {
+      background: #cbd5e1;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+      text-decoration: none;
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; width: 100%; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-success { background: var(--success); color: #fff; width: 100%; }
+    .btn-success:hover { background: #15803d; }
+    .btn-outline { background: var(--surface); border-color: var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    /* Tables */
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 10px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 10px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-paid {
+      background: var(--success-light);
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .badge-partial {
+      background: var(--warning-light);
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-due {
+      background: var(--danger-light);
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .badge-type {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .type-visit { background: #e0f2fe; color: #0369a1; }
+    .type-lab { background: #ede9fe; color: #6d28d9; }
+
+    .badge-method {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: var(--text-main);
+    }
+
+    .method-bkash-tag {
+      background: var(--bkash-light);
+      color: var(--bkash);
+      font-weight: 700;
+    }
+
+    /* Tabs inside right panel */
+    .tab-header {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* Printable Receipt Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .receipt-modal {
+      background: #fff;
+      max-width: 500px;
+      width: 100%;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 28px;
+      position: relative;
+    }
+
+    .receipt-header {
+      text-align: center;
+      border-bottom: 2px dashed var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+    }
+
+    .receipt-header h3 {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .receipt-header p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .receipt-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .receipt-totals {
+      border-top: 2px dashed var(--border);
+      padding-top: 12px;
+      margin-top: 14px;
+      font-size: 13px;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .receipt-row.grand {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      border-top: 1px solid var(--border);
+      padding-top: 6px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(120px);
+      transition: transform 0.25s ease-out;
+      z-index: 100;
+    }
+    #toast.show { transform: translateY(0); }
+
+    /* Print styling */
+    @media print {
+      body * { visibility: hidden; }
+      .receipt-modal, .receipt-modal * { visibility: visible; }
+      .receipt-modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 100%;
+        box-shadow: none;
+        padding: 0;
+      }
+      .no-print { display: none !important; }
+    }
+
+    @media (max-width: 960px) {
+      .billing-grid { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .stat-row { grid-template-columns: 1fr; }
+      .nav-container { flex-direction: column; height: auto; padding: 12px 16px; gap: 12px; }
+      .nav-links { flex-wrap: wrap; justify-content: center; width: 100%; }
+      .main-content { padding: 16px 12px; }
+      .payment-methods { grid-template-columns: 1fr; }
+    }
+  
+/* ===== BOLD visual redesign — clearly visible upgrade ===== */
+/* --- page background: subtle top glow --- */
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -80px, rgba(3,105,161,.10), transparent 70%),
+    var(--bg);
+}
+/* --- hero: vibrant gradient + glow --- */
+.hero-header{
+  background:linear-gradient(115deg,#0c4a6e 0%,#0369a1 48%,#0f766e 100%) !important;
+  box-shadow:0 24px 48px -16px rgba(3,105,161,.45),0 8px 16px -8px rgba(15,118,110,.30) !important;
+  padding:40px 44px !important;
+  position:relative;
+  overflow:hidden;
+  border:none !important;
+}
+.hero-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(600px 300px at 88% 12%,rgba(255,255,255,.16),transparent 60%);
+  pointer-events:none;
+}
+.hero-header h2{
+  font-size:2rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.03em !important;
+  color:#fff !important;
+}
+.hero-header p{
+  color:rgba(255,255,255,.82) !important;
+  font-size:1.02rem !important;
+  max-width:56ch;
+}
+/* --- stat cards: accent top-bar + bigger numbers --- */
+.stat-card{
+  border:none !important;
+  border-top:5px solid var(--card-accent,var(--primary)) !important;
+  box-shadow:0 10px 24px -10px rgba(15,23,42,.14),0 4px 8px -4px rgba(15,23,42,.06) !important;
+  border-radius:16px !important;
+  padding:24px !important;
+}
+.stat-grid .stat-card:nth-child(1){--card-accent:#0284c7;}
+.stat-grid .stat-card:nth-child(2){--card-accent:#16a34a;}
+.stat-grid .stat-card:nth-child(3){--card-accent:#d97706;}
+.stat-grid .stat-card:nth-child(4){--card-accent:#7c3aed;}
+.stat-card .value{
+  font-size:2.1rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.02em;
+  color:var(--text-main);
+}
+.stat-card .label{
+  font-size:.78rem !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-icon{
+  width:52px !important;
+  height:52px !important;
+  font-size:1.6rem !important;
+  border-radius:14px !important;
+}
+/* --- navbar: premium sticky bar --- */
+.navbar{
+  box-shadow:0 4px 20px -6px rgba(15,23,42,.12) !important;
+  border-bottom:2px solid var(--primary-light) !important;
+}
+.brand-logo{
+  width:42px !important;
+  height:42px !important;
+  font-size:1.15rem !important;
+  box-shadow:0 6px 14px -4px rgba(3,105,161,.5) !important;
+}
+/* --- buttons: vibrant --- */
+.btn-sample,.btn-ai-chat{
+  background:linear-gradient(135deg,#16a34a,#15803d) !important;
+  box-shadow:0 10px 20px -8px rgba(22,163,74,.55) !important;
+  font-weight:700 !important;
+  padding:12px 22px !important;
+  border-radius:12px !important;
+}
+.btn-sample:hover,.btn-ai-chat:hover{
+  box-shadow:0 14px 26px -8px rgba(22,163,74,.65) !important;
+}
+/* --- shortcut cards: bolder --- */
+.shortcut-card{
+  border-radius:16px !important;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px -10px rgba(15,23,42,.10) !important;
+}
+.shortcut-card:hover{
+  border-color:var(--primary-light) !important;
+}
+.shortcut-icon{
+  width:56px !important;
+  height:56px !important;
+  font-size:1.7rem !important;
+  border-radius:16px !important;
+}
+/* --- section titles with accent bar --- */
+.shortcuts-title,.card-header h3{
+  position:relative;
+  padding-left:14px;
+}
+.shortcuts-title::before,.card-header h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:4px;
+  border-radius:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+/* --- tables: premium header --- */
+thead th{
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0) !important;
+  font-size:.75rem !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:14px 16px !important;
+}
+/* --- badges pop --- */
+.badge-done,.badge-pending,.badge-status{
+  font-weight:700 !important;
+  padding:5px 12px !important;
+  border-radius:999px !important;
+}
+
+/* ===== Guideline essentials (kept from polish pass) ===== */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+h1,h2,h3{text-wrap:balance;}
+.stat-card .value,.value,.metric,td,th,.amount,.doc-fee{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none !important;animation:none !important;}}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar no-print">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">C+</div>
+        <div class="brand-text">
+          <h1>CarePoint Hospital</h1>
+          <p>Management System</p>
+        </div>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html"><span>🏠</span> Dashboard</a></li>
+          <li><a href="patients.html"><span>👤</span> Patients</a></li>
+          <li><a href="visits.html"><span>🩺</span> Doctor Visit</a></li>
+          <li><a href="lab.html"><span>🧪</span> Lab Tests</a></li>
+          <li><a href="billing.html" class="active"><span>💳</span> Billing</a></li>
+          <li><a href="reports.html"><span>📊</span> Reports</a></li>
+          <li><a href="chat.html" class="nav-badge-ai"><span>💬</span> AI Assistant</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    
+    <div class="page-header no-print">
+      <div class="page-title">
+        <h2>Hospital Billing & Collections</h2>
+        <p>Review patient accounts (visits + lab tests), collect payments via Cash, Card, or bKash, and issue receipts.</p>
+      </div>
+      <div>
+        <a href="reports.html" class="btn btn-outline btn-sm">View Daily Financial Report &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Aggregate Overview Stats -->
+    <div class="stat-row no-print">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">💰</div>
+        <div class="stat-meta">
+          <h3 id="statTotalBilled">Tk 0</h3>
+          <p>Total Billed (Visits + Lab)</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">✅</div>
+        <div class="stat-meta">
+          <h3 id="statTotalCollected" style="color: #16a34a;">Tk 0</h3>
+          <p>Total Money Collected</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">⏳</div>
+        <div class="stat-meta">
+          <h3 id="statTotalDue" style="color: #dc2626;">Tk 0</h3>
+          <p>Total Outstanding Due</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fce7f0; color: #e2136e;">📱</div>
+        <div class="stat-meta">
+          <h3 id="statBkashCollected" style="color: #e2136e;">Tk 0</h3>
+          <p>bKash Mobile Collections</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dual Panel -->
+    <div class="billing-grid no-print">
+      
+      <!-- Left Column: Patient Account & Payment Form -->
+      <div class="card">
+        <div class="card-title">
+          <span>💳 Collect Patient Payment</span>
+          <span style="font-size:12px; color:var(--text-muted);" id="paymentFormSub">Select patient to begin</span>
+        </div>
+
+        <!-- 1. Patient Picker -->
+        <div class="patient-picker-box">
+          <label style="margin-bottom: 6px; display: block;">1. Select Patient <span style="color:var(--danger)">*</span></label>
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="patientSearchInput" placeholder="Search by name, ID (e.g. P-0001) or phone…" autocomplete="off">
+          </div>
+          <div id="patientSuggestions" class="patient-suggestions"></div>
+
+          <div id="selectedPatientCard" class="selected-patient-card">
+            <div>
+              <div class="patient-meta-name" id="selectedPatientName">Patient Name (P-0000)</div>
+              <div class="patient-meta-sub" id="selectedPatientInfo">Details</div>
+            </div>
+            <button type="button" class="btn-clear-patient" id="btnClearPatient" title="Select different patient">&times;</button>
+          </div>
+          <input type="hidden" id="selectedPatientId">
+        </div>
+
+        <!-- 2. Patient Ledger Breakdown (Total, Paid, Due) -->
+        <div class="balance-box" id="patientBalanceBox" style="display: none;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
+            Account Balance for <span id="balancePatientLabel">Patient</span>
+          </div>
+          <div class="balance-grid">
+            <div class="balance-item">
+              <div class="lbl">Total Invoiced</div>
+              <div class="val val-total" id="patTotalBilled">Tk 0</div>
+            </div>
+            <div class="balance-item">
+              <div class="lbl">Total Paid</div>
+              <div class="val val-paid" id="patTotalPaid">Tk 0</div>
+            </div>
+            <div class="balance-item">
+              <div class="lbl">Balance Due</div>
+              <div class="val val-due" id="patBalanceDue">Tk 0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Payment Processing Form -->
+        <form id="paymentForm">
+          
+          <div class="form-group">
+            <label>Payment Method <span style="color:var(--danger)">*</span></label>
+            <div class="payment-methods">
+              <label class="method-radio-label selected" id="methodCashLabel">
+                <input type="radio" name="paymentMethod" value="Cash" checked>
+                <span class="method-icon">💵</span>
+                <span>Cash</span>
+              </label>
+
+              <label class="method-radio-label" id="methodCardLabel">
+                <input type="radio" name="paymentMethod" value="Card">
+                <span class="method-icon">💳</span>
+                <span>Card (POS)</span>
+              </label>
+
+              <label class="method-radio-label" id="methodBkashLabel">
+                <input type="radio" name="paymentMethod" value="bKash">
+                <span class="method-icon">📱</span>
+                <span style="color:#e2136e;">bKash</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Transaction Ref (For bKash or Card) -->
+          <div class="form-group" id="trxIdGroup" style="display: none;">
+            <label for="trxReference" id="trxRefLabel">Transaction ID / Slip No.</label>
+            <input type="text" id="trxReference" class="input-field" placeholder="e.g. 9B7A23KLP9 or Card Auth 4482">
+          </div>
+
+          <div class="form-group">
+            <label for="paymentAmount">Amount to Pay (Tk) <span style="color:var(--danger)">*</span></label>
+            <div class="input-with-currency">
+              <span>Tk</span>
+              <input type="number" id="paymentAmount" class="input-field" min="1" step="any" placeholder="0" required>
+            </div>
+            <div class="quick-amount-tags" id="quickTagsContainer" style="display: none;">
+              <button type="button" class="quick-tag" id="btnPayFull">Pay Full Due</button>
+              <button type="button" class="quick-tag" id="btnPayHalf">50% Due</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="paymentDate">Payment Date <span style="color:var(--danger)">*</span></label>
+            <input type="date" id="paymentDate" class="input-field" required>
+          </div>
+
+          <div class="form-group">
+            <label for="paymentNotes">Remarks / Receipt Note (Optional)</label>
+            <input type="text" id="paymentNotes" class="input-field" placeholder="e.g. Cleared pending lab test dues">
+          </div>
+
+          <button type="submit" class="btn btn-success" id="btnSubmitPayment" disabled>
+            <span>💰</span> Receive Payment & Issue Receipt
+          </button>
+        </form>
+
+      </div>
+
+      <!-- Right Column: Patient Unpaid Items & All Transaction History -->
+      <div class="card">
+        
+        <div class="tab-header">
+          <button class="tab-btn active" id="tabBtnPatientItems" onclick="switchTab('patientItems')">
+            Patient Charges (<span id="unpaidCountBadge">0</span>)
+          </button>
+          <button class="tab-btn" id="tabBtnAllHistory" onclick="switchTab('allHistory')">
+            Recent Collections
+          </button>
+        </div>
+
+        <!-- Tab 1: Current Patient's Charges Breakdown -->
+        <div id="tabContentPatientItems">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:12.5px; color:var(--text-muted);" id="chargesListSub">
+              Itemized charges for selected patient
+            </span>
+            <span class="badge-status badge-due" id="selectedPatientStatusBadge" style="display: none;">Unsettled</span>
+          </div>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="patientChargesTableBody">
+                <tr>
+                  <td colspan="5" style="text-align:center; padding: 36px; color: var(--text-muted);">
+                    Select a patient on the left to see their visit and test charges.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 2: Recent Collection Transactions -->
+        <div id="tabContentAllHistory" style="display: none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:12.5px; color:var(--text-muted);">Recent payment receipts across all patients</span>
+            <input type="text" id="historySearch" placeholder="Search receipt/patient…" style="padding: 5px 10px; font-size: 12px; border: 1px solid var(--border); border-radius: 4px; width: 180px;">
+          </div>
+
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Receipt ID</th>
+                  <th>Patient</th>
+                  <th>Date</th>
+                  <th>Method</th>
+                  <th>Paid</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="paymentHistoryTableBody">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Printable Payment Receipt Modal -->
+  <div class="modal-backdrop" id="receiptModal">
+    <div class="receipt-modal">
+      <div class="receipt-header">
+        <div style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom:4px;">
+          <div class="brand-logo" style="width:28px; height:28px; font-size:14px;">C+</div>
+          <h3 style="font-size:17px;">CarePoint Hospital</h3>
+        </div>
+        <p>Road 11, Dhanmondi, Dhaka-1209 &middot; Tel: 01711-000000</p>
+        <div style="font-weight:700; color:var(--primary-dark); font-size:13px; margin-top:6px; letter-spacing:1px; text-transform:uppercase;">
+          Payment Receipt &amp; Acknowledgment
+        </div>
+      </div>
+
+      <div class="receipt-meta">
+        <div><strong>Receipt No:</strong> <span id="recNo">-</span></div>
+        <div><strong>Date:</strong> <span id="recDate">-</span></div>
+        <div><strong>Patient ID:</strong> <span id="recPatId">-</span></div>
+        <div><strong>Name:</strong> <span id="recPatName">-</span></div>
+      </div>
+
+      <div style="font-size:12px; margin-bottom:12px;" id="recItemBreakdown">
+        <!-- Filled by JS -->
+      </div>
+
+      <div class="receipt-totals">
+        <div class="receipt-row">
+          <span>Previous Due:</span>
+          <span id="recPrevDue">Tk 0</span>
+        </div>
+        <div class="receipt-row">
+          <span style="font-weight:700;">Amount Paid Now:</span>
+          <span style="font-weight:700; color:var(--success);" id="recAmountPaid">Tk 0</span>
+        </div>
+        <div class="receipt-row">
+          <span>Payment Method:</span>
+          <span id="recMethod">Cash</span>
+        </div>
+        <div class="receipt-row grand">
+          <span>Remaining Balance Due:</span>
+          <span id="recRemainDue" style="color:var(--danger);">Tk 0</span>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; font-size:11px; text-align:center; color:var(--text-muted); border-top:1px solid var(--border); padding-top:8px;">
+        Thank you for choosing CarePoint Hospital. Keep this receipt for verification.
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;" class="no-print">
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeReceiptModal()">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Print Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast">Payment processed successfully!</div>
+
+  <script>
+    const KEYS = {
+      PATIENTS: 'hm_patients',
+      VISITS: 'hm_visits',
+      LAB_TESTS: 'hm_lab_tests',
+      PAYMENTS: 'hm_payments',
+      RECEIPTS: 'hm_receipts'
+    };
+
+    function getData(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setData(key, val) {
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    let activePatient = null;
+    let patientSummary = { total: 0, paid: 0, due: 0, items: [] };
+
+    // Set today's date
+    document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+
+    // Method radio toggle styling
+    const methodInputs = document.querySelectorAll('input[name="paymentMethod"]');
+    methodInputs.forEach(input => {
+      input.addEventListener('change', function() {
+        document.querySelectorAll('.method-radio-label').forEach(lbl => {
+          lbl.classList.remove('selected', 'bkash-selected');
+        });
+        const parent = this.closest('.method-radio-label');
+        if (this.value === 'bKash') {
+          parent.classList.add('bkash-selected');
+          document.getElementById('trxIdGroup').style.display = 'flex';
+          document.getElementById('trxRefLabel').textContent = 'bKash Transaction ID (TrxID) *';
+          document.getElementById('trxReference').placeholder = 'e.g. 9B8C7A6D5E';
+        } else if (this.value === 'Card') {
+          parent.classList.add('selected');
+          document.getElementById('trxIdGroup').style.display = 'flex';
+          document.getElementById('trxRefLabel').textContent = 'Card Slip / Authorization No.';
+          document.getElementById('trxReference').placeholder = 'e.g. Auth-90214';
+        } else {
+          parent.classList.add('selected');
+          document.getElementById('trxIdGroup').style.display = 'none';
+        }
+      });
+    });
+
+    // Patient Autocomplete & Selection
+    const searchInput = document.getElementById('patientSearchInput');
+    const suggestionsBox = document.getElementById('patientSuggestions');
+    const selectedCard = document.getElementById('selectedPatientCard');
+    const selectedPatientId = document.getElementById('selectedPatientId');
+
+    searchInput.addEventListener('input', function() {
+      const q = this.value.trim().toLowerCase();
+      if (!q) {
+        suggestionsBox.style.display = 'none';
+        return;
+      }
+
+      const patients = getData(KEYS.PATIENTS);
+      const matches = patients.filter(p => 
+        (p.id && p.id.toLowerCase().includes(q)) ||
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.phone && p.phone.toLowerCase().includes(q))
+      ).slice(0, 8);
+
+      if (matches.length === 0) {
+        suggestionsBox.innerHTML = '<div style="padding:10px; font-size:12px; color:#64748b;">No matching patient found.</div>';
+        suggestionsBox.style.display = 'block';
+        return;
+      }
+
+      suggestionsBox.innerHTML = matches.map(p => `
+        <div class="patient-suggestion-item" onclick="selectPatient('${p.id}')">
+          <div>
+            <strong>${p.name}</strong> <span style="font-family:monospace; color:var(--primary); font-size:11.5px;">(${p.id})</span>
+          </div>
+          <div style="font-size:11.5px; color:#64748b;">${p.gender}, ${p.age}y &middot; ${p.phone}</div>
+        </div>
+      `).join('');
+      suggestionsBox.style.display = 'block';
+    });
+
+    window.selectPatient = function(id) {
+      const patients = getData(KEYS.PATIENTS);
+      const patient = patients.find(p => p.id === id);
+      if (!patient) return;
+
+      activePatient = patient;
+      selectedPatientId.value = patient.id;
+      document.getElementById('selectedPatientName').textContent = `${patient.name} (${patient.id})`;
+      document.getElementById('selectedPatientInfo').textContent = `Age: ${patient.age}y · ${patient.gender} · Phone: ${patient.phone}`;
+      
+      selectedCard.style.display = 'flex';
+      searchInput.value = '';
+      suggestionsBox.style.display = 'none';
+
+      loadPatientAccount(patient.id);
+    };
+
+    document.getElementById('btnClearPatient').addEventListener('click', function() {
+      activePatient = null;
+      selectedPatientId.value = '';
+      selectedCard.style.display = 'none';
+      document.getElementById('patientBalanceBox').style.display = 'none';
+      document.getElementById('quickTagsContainer').style.display = 'none';
+      document.getElementById('btnSubmitPayment').disabled = true;
+      document.getElementById('paymentAmount').value = '';
+      searchInput.value = '';
+      searchInput.focus();
+
+      // Reset right table
+      document.getElementById('patientChargesTableBody').innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center; padding: 36px; color: var(--text-muted);">
+            Select a patient on the left to see their visit and test charges.
+          </td>
+        </tr>
+      `;
+      document.getElementById('unpaidCountBadge').textContent = '0';
+      document.getElementById('selectedPatientStatusBadge').style.display = 'none';
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+        suggestionsBox.style.display = 'none';
+      }
+    });
+
+    // Calculate Patient's Total, Paid and Due
+    function loadPatientAccount(patId) {
+      const visits = getData(KEYS.VISITS).filter(v => v.patientId === patId);
+      const tests = getData(KEYS.LAB_TESTS).filter(t => t.patientId === patId);
+      const receipts = getData(KEYS.RECEIPTS).filter(r => r.patientId === patId);
+
+      let items = [];
+      let totalBilled = 0;
+
+      // Visits
+      visits.forEach(v => {
+        const fee = Number(v.fee) || 0;
+        totalBilled += fee;
+        items.push({
+          id: v.id,
+          type: 'Doctor Visit',
+          typeClass: 'type-visit',
+          desc: `Dr. Consultation (${v.doctorName || 'Doctor'})`,
+          date: v.date,
+          amount: fee
+        });
+      });
+
+      // Lab Tests
+      tests.forEach(t => {
+        const cost = Number(t.cost) || 0;
+        totalBilled += cost;
+        items.push({
+          id: t.id,
+          type: 'Lab Test',
+          typeClass: 'type-lab',
+          desc: t.testName,
+          date: t.date,
+          amount: cost
+        });
+      });
+
+      // Total collected through receipts
+      const totalPaid = receipts.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
+      const balanceDue = Math.max(0, totalBilled - totalPaid);
+
+      patientSummary = {
+        total: totalBilled,
+        paid: totalPaid,
+        due: balanceDue,
+        items: items
+      };
+
+      // Update UI cards
+      document.getElementById('patientBalanceBox').style.display = 'block';
+      document.getElementById('balancePatientLabel').textContent = activePatient.name;
+      document.getElementById('patTotalBilled').textContent = `Tk ${totalBilled.toLocaleString()}`;
+      document.getElementById('patTotalPaid').textContent = `Tk ${totalPaid.toLocaleString()}`;
+      document.getElementById('patBalanceDue').textContent = `Tk ${balanceDue.toLocaleString()}`;
+
+      // Quick amount buttons
+      document.getElementById('quickTagsContainer').style.display = balanceDue > 0 ? 'flex' : 'none';
+      document.getElementById('btnSubmitPayment').disabled = false;
+      document.getElementById('paymentAmount').value = balanceDue > 0 ? balanceDue : '';
+
+      // Badges
+      const statusBadge = document.getElementById('selectedPatientStatusBadge');
+      statusBadge.style.display = 'inline-flex';
+      if (balanceDue === 0 && totalBilled > 0) {
+        statusBadge.className = 'badge-status badge-paid';
+        statusBadge.textContent = 'Fully Settled';
+      } else if (totalPaid > 0 && balanceDue > 0) {
+        statusBadge.className = 'badge-status badge-partial';
+        statusBadge.textContent = 'Partially Due';
+      } else if (balanceDue > 0) {
+        statusBadge.className = 'badge-status badge-due';
+        statusBadge.textContent = 'Payment Due';
+      } else {
+        statusBadge.className = 'badge-status badge-paid';
+        statusBadge.textContent = 'No Charges';
+      }
+
+      document.getElementById('unpaidCountBadge').textContent = items.length;
+
+      // Populate Items Table
+      const tbody = document.getElementById('patientChargesTableBody');
+      if (items.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center; padding: 24px; color: var(--text-muted);">
+              No consultation visits or lab tests ordered for this patient yet.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = items.map(item => `
+        <tr>
+          <td><span class="badge-type ${item.typeClass}">${item.type}</span></td>
+          <td><strong>${item.desc}</strong><div style="font-size:11px; color:var(--text-muted);">${item.id}</div></td>
+          <td>${item.date}</td>
+          <td><strong>Tk ${item.amount.toLocaleString()}</strong></td>
+          <td>
+            <span class="badge-status ${balanceDue === 0 ? 'badge-paid' : 'badge-due'}">
+              ${balanceDue === 0 ? 'Paid' : 'Invoiced'}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Quick tag buttons
+    document.getElementById('btnPayFull').addEventListener('click', () => {
+      document.getElementById('paymentAmount').value = patientSummary.due;
+    });
+
+    document.getElementById('btnPayHalf').addEventListener('click', () => {
+      document.getElementById('paymentAmount').value = Math.round(patientSummary.due / 2);
+    });
+
+    // Handle Payment Submission
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (!activePatient) {
+        alert('Please select a patient first.');
+        searchInput.focus();
+        return;
+      }
+
+      const amount = Number(document.getElementById('paymentAmount').value);
+      if (amount <= 0 || isNaN(amount)) {
+        alert('Please enter a valid payment amount.');
+        return;
+      }
+
+      const selectedMethodEl = document.querySelector('input[name="paymentMethod"]:checked');
+      const method = selectedMethodEl ? selectedMethodEl.value : 'Cash';
+      const date = document.getElementById('paymentDate').value;
+      const ref = document.getElementById('trxReference').value.trim();
+      const notes = document.getElementById('paymentNotes').value.trim();
+
+      const receipts = getData(KEYS.RECEIPTS);
+      const receiptId = 'REC-' + String(receipts.length + 1001).padStart(5, '0');
+
+      const newReceipt = {
+        id: receiptId,
+        patientId: activePatient.id,
+        patientName: activePatient.name,
+        amount: amount,
+        method: method,
+        reference: ref,
+        notes: notes,
+        date: date,
+        prevDue: patientSummary.due,
+        remainingDue: Math.max(0, patientSummary.due - amount),
+        createdAt: new Date().toISOString()
+      };
+
+      receipts.push(newReceipt);
+      setData(KEYS.RECEIPTS, receipts);
+
+      // Also record in hm_payments ledger
+      const payments = getData(KEYS.PAYMENTS);
+      payments.push({
+        id: receiptId,
+        patientId: activePatient.id,
+        type: 'receipt',
+        amount: amount,
+        total: amount,
+        paid: amount,
+        due: 0,
+        method: method,
+        date: date,
+        description: `Payment Collection (${method})`
+      });
+      setData(KEYS.PAYMENTS, payments);
+
+      showToast(`Payment of Tk ${amount.toLocaleString()} received via ${method}!`);
+
+      // Open Receipt Modal
+      openReceiptModal(newReceipt);
+
+      // Refresh Ledger
+      loadPatientAccount(activePatient.id);
+      renderGlobalStats();
+      renderAllHistory();
+
+      // Reset payment form fields
+      document.getElementById('trxReference').value = '';
+      document.getElementById('paymentNotes').value = '';
+    });
+
+    // Tab switcher
+    window.switchTab = function(tabName) {
+      const btnItems = document.getElementById('tabBtnPatientItems');
+      const btnHist = document.getElementById('tabBtnAllHistory');
+      const contentItems = document.getElementById('tabContentPatientItems');
+      const contentHist = document.getElementById('tabContentAllHistory');
+
+      if (tabName === 'patientItems') {
+        btnItems.classList.add('active');
+        btnHist.classList.remove('active');
+        contentItems.style.display = 'block';
+        contentHist.style.display = 'none';
+      } else {
+        btnHist.classList.add('active');
+        btnItems.classList.remove('active');
+        contentHist.style.display = 'block';
+        contentItems.style.display = 'none';
+        renderAllHistory();
+      }
+    };
+
+    // Render Global Overview Statistics
+    function renderGlobalStats() {
+      const visits = getData(KEYS.VISITS);
+      const tests = getData(KEYS.LAB_TESTS);
+      const receipts = getData(KEYS.RECEIPTS);
+
+      const visitTotal = visits.reduce((acc, v) => acc + (Number(v.fee) || 0), 0);
+      const testTotal = tests.reduce((acc, t) => acc + (Number(t.cost) || 0), 0);
+      const totalBilled = visitTotal + testTotal;
+
+      const totalPaid = receipts.reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
+      const totalDue = Math.max(0, totalBilled - totalPaid);
+
+      const bkashTotal = receipts
+        .filter(r => r.method === 'bKash')
+        .reduce((acc, r) => acc + (Number(r.amount) || 0), 0);
+
+      document.getElementById('statTotalBilled').textContent = `Tk ${totalBilled.toLocaleString()}`;
+      document.getElementById('statTotalCollected').textContent = `Tk ${totalPaid.toLocaleString()}`;
+      document.getElementById('statTotalDue').textContent = `Tk ${totalDue.toLocaleString()}`;
+      document.getElementById('statBkashCollected').textContent = `Tk ${bkashTotal.toLocaleString()}`;
+    }
+
+    // Render All Receipts History Table
+    function renderAllHistory() {
+      const receipts = getData(KEYS.RECEIPTS);
+      const query = (document.getElementById('historySearch')?.value || '').toLowerCase().trim();
+
+      let list = [...receipts].reverse();
+
+      if (query) {
+        list = list.filter(r => 
+          r.id.toLowerCase().includes(query) ||
+          r.patientId.toLowerCase().includes(query) ||
+          (r.patientName && r.patientName.toLowerCase().includes(query)) ||
+          r.method.toLowerCase().includes(query)
+        );
+      }
+
+      const tbody = document.getElementById('paymentHistoryTableBody');
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding: 28px; color: var(--text-muted);">
+              No payment receipts found.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = list.map(r => `
+        <tr>
+          <td><strong style="font-family:monospace; color:var(--primary);">${r.id}</strong></td>
+          <td>
+            <strong>${r.patientName || r.patientId}</strong>
+            <div style="font-size:11px; color:var(--text-muted);">${r.patientId}</div>
+          </td>
+          <td>${r.date}</td>
+          <td>
+            <span class="badge-method ${r.method === 'bKash' ? 'method-bkash-tag' : ''}">
+              ${r.method === 'bKash' ? '📱 bKash' : r.method === 'Card' ? '💳 Card' : '💵 Cash'}
+            </span>
+          </td>
+          <td><strong style="color:var(--success);">Tk ${(Number(r.amount) || 0).toLocaleString()}</strong></td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="viewReceiptById('${r.id}')">View</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('historySearch')?.addEventListener('input', renderAllHistory);
+
+    // Receipt Modal Handling
+    function openReceiptModal(receipt) {
+      document.getElementById('recNo').textContent = receipt.id;
+      document.getElementById('recDate').textContent = receipt.date;
+      document.getElementById('recPatId').textContent = receipt.patientId;
+      document.getElementById('recPatName').textContent = receipt.patientName || 'Patient';
+      document.getElementById('recPrevDue').textContent = `Tk ${(receipt.prevDue || 0).toLocaleString()}`;
+      document.getElementById('recAmountPaid').textContent = `Tk ${(receipt.amount || 0).toLocaleString()}`;
+      document.getElementById('recMethod').textContent = receipt.method + (receipt.reference ? ` (${receipt.reference})` : '');
+      document.getElementById('recRemainDue').textContent = `Tk ${(receipt.remainingDue || 0).toLocaleString()}`;
+
+      // Breakdown note
+      document.getElementById('recItemBreakdown').innerHTML = `
+        <div style="background:#f8fafc; border:1px solid var(--border); padding:8px 12px; border-radius:4px;">
+          <strong>Account Summary:</strong> Payment credited toward outstanding OPD consultations and pathology tests.
+          ${receipt.notes ? `<div style="margin-top:4px; color:var(--text-muted);">Note: ${receipt.notes}</div>` : ''}
+        </div>
+      `;
+
+      document.getElementById('receiptModal').style.display = 'flex';
+    }
+
+    window.closeReceiptModal = function() {
+      document.getElementById('receiptModal').style.display = 'none';
+    };
+
+    window.viewReceiptById = function(id) {
+      const receipts = getData(KEYS.RECEIPTS);
+      const r = receipts.find(item => item.id === id);
+      if (r) openReceiptModal(r);
+    };
+
+    // Auto-select patient from URL if passed (e.g. billing.html?patientId=P-0001)
+    function checkUrlPatientParam() {
+      const params = new URLSearchParams(window.location.search);
+      const pId = params.get('patientId');
+      if (pId) {
+        selectPatient(pId);
+      }
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      renderGlobalStats();
+      renderAllHistory();
+      checkUrlPatientParam();
+    });
+  </script>
+</body>
+</html>

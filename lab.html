@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarePoint Hospital - Lab Tests & Diagnostics</title>
+  <style>
+    :root {
+      --primary: #0369a1;
+      --primary-dark: #075985;
+      --primary-light: #e0f2fe;
+      --accent: #0f766e;
+      --accent-light: #ccfbf1;
+      --success: #15803d;
+      --success-light: #dcfce7;
+      --warning: #b45309;
+      --warning-light: #fef3c7;
+      --danger: #b91c1c;
+      --danger-light: #fee2e2;
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10), 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+      --shadow-lg: 0 12px 28px -6px rgba(15, 23, 42, 0.14), 0 6px 12px -6px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .brand-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+      background-color: var(--primary-light);
+    }
+
+    .nav-links a.active {
+      color: var(--primary-dark);
+      background-color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .nav-badge-ai {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: white !important;
+      font-weight: 600 !important;
+    }
+
+    /* Main Container */
+    .main-content {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title h2 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .page-title p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    /* Stat Pills */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .stat-meta h3 {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .stat-meta p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Layout Grid */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Search & Picker */
+    .patient-picker-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-bottom: 20px;
+    }
+
+    .search-input-wrap {
+      position: relative;
+    }
+
+    .search-input-wrap input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      font-size: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+    }
+
+    .search-input-wrap .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .patient-suggestions {
+      margin-top: 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+
+    .patient-suggestion-item {
+      padding: 9px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .patient-suggestion-item:hover {
+      background-color: var(--primary-light);
+    }
+
+    .selected-patient-card {
+      display: none;
+      background: var(--primary-light);
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-top: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .patient-meta-name {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 14px;
+    }
+
+    .patient-meta-sub {
+      font-size: 12px;
+      color: #0369a1;
+      margin-top: 2px;
+    }
+
+    .btn-clear-patient {
+      background: none;
+      border: none;
+      color: #0369a1;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    /* Test Selector Checklist */
+    .test-catalog-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      max-height: 240px;
+      overflow-y: auto;
+      background: #fafafa;
+      margin-bottom: 16px;
+    }
+
+    .test-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 4px;
+      transition: background 0.15s ease;
+      cursor: pointer;
+    }
+
+    .test-item-row:hover {
+      background: var(--primary-light);
+    }
+
+    .test-checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      font-weight: 500;
+    }
+
+    .test-price {
+      font-weight: 700;
+      color: #047857;
+      font-size: 13px;
+    }
+
+    /* Form Fields */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .input-field, select {
+      padding: 9px 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text-main);
+    }
+
+    /* Total Fee Callout */
+    .fee-callout {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .fee-callout .fee-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #065f46;
+    }
+
+    .fee-callout .fee-value {
+      font-size: 19px;
+      font-weight: 800;
+      color: #047857;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition:transform 0.15s ease,box-shadow 0.15s ease,background-color 0.15s ease,border-color 0.15s ease ease;
+      text-decoration: none;
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; width: 100%; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: var(--surface); border-color: var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: #f1f5f9; }
+
+    /* Orders Table Section */
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: var(--radius-sm);
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border: none;
+      background: transparent;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      background: #fff;
+      color: var(--primary-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: 600px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 10px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .status-pending {
+      background: var(--warning-light);
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .status-done {
+      background: var(--success-light);
+      color: #047857;
+      border: 1px solid #a7f3d0;
+    }
+
+    .id-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    .btn-action-res {
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+    .btn-action-res:hover {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-color: #7dd3fc;
+    }
+
+    /* Result Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #fff;
+      max-width: 580px;
+      width: 100%;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      padding: 24px;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .modal-meta-box {
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(120px);
+      transition: transform 0.25s ease-out;
+      z-index: 100;
+    }
+    #toast.show { transform: translateY(0); }
+
+    @media (max-width: 960px) {
+      .lab-grid { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-container { flex-direction: column; height: auto; padding: 12px 16px; gap: 12px; }
+      .nav-links { flex-wrap: wrap; justify-content: center; width: 100%; }
+      .main-content { padding: 16px 12px; }
+    }
+  
+/* ===== BOLD visual redesign — clearly visible upgrade ===== */
+/* --- page background: subtle top glow --- */
+body{
+  background:
+    radial-gradient(1200px 400px at 50% -80px, rgba(3,105,161,.10), transparent 70%),
+    var(--bg);
+}
+/* --- hero: vibrant gradient + glow --- */
+.hero-header{
+  background:linear-gradient(115deg,#0c4a6e 0%,#0369a1 48%,#0f766e 100%) !important;
+  box-shadow:0 24px 48px -16px rgba(3,105,161,.45),0 8px 16px -8px rgba(15,118,110,.30) !important;
+  padding:40px 44px !important;
+  position:relative;
+  overflow:hidden;
+  border:none !important;
+}
+.hero-header::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(600px 300px at 88% 12%,rgba(255,255,255,.16),transparent 60%);
+  pointer-events:none;
+}
+.hero-header h2{
+  font-size:2rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.03em !important;
+  color:#fff !important;
+}
+.hero-header p{
+  color:rgba(255,255,255,.82) !important;
+  font-size:1.02rem !important;
+  max-width:56ch;
+}
+/* --- stat cards: accent top-bar + bigger numbers --- */
+.stat-card{
+  border:none !important;
+  border-top:5px solid var(--card-accent,var(--primary)) !important;
+  box-shadow:0 10px 24px -10px rgba(15,23,42,.14),0 4px 8px -4px rgba(15,23,42,.06) !important;
+  border-radius:16px !important;
+  padding:24px !important;
+}
+.stat-grid .stat-card:nth-child(1){--card-accent:#0284c7;}
+.stat-grid .stat-card:nth-child(2){--card-accent:#16a34a;}
+.stat-grid .stat-card:nth-child(3){--card-accent:#d97706;}
+.stat-grid .stat-card:nth-child(4){--card-accent:#7c3aed;}
+.stat-card .value{
+  font-size:2.1rem !important;
+  font-weight:800 !important;
+  letter-spacing:-0.02em;
+  color:var(--text-main);
+}
+.stat-card .label{
+  font-size:.78rem !important;
+  font-weight:700 !important;
+  letter-spacing:.08em !important;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-icon{
+  width:52px !important;
+  height:52px !important;
+  font-size:1.6rem !important;
+  border-radius:14px !important;
+}
+/* --- navbar: premium sticky bar --- */
+.navbar{
+  box-shadow:0 4px 20px -6px rgba(15,23,42,.12) !important;
+  border-bottom:2px solid var(--primary-light) !important;
+}
+.brand-logo{
+  width:42px !important;
+  height:42px !important;
+  font-size:1.15rem !important;
+  box-shadow:0 6px 14px -4px rgba(3,105,161,.5) !important;
+}
+/* --- buttons: vibrant --- */
+.btn-sample,.btn-ai-chat{
+  background:linear-gradient(135deg,#16a34a,#15803d) !important;
+  box-shadow:0 10px 20px -8px rgba(22,163,74,.55) !important;
+  font-weight:700 !important;
+  padding:12px 22px !important;
+  border-radius:12px !important;
+}
+.btn-sample:hover,.btn-ai-chat:hover{
+  box-shadow:0 14px 26px -8px rgba(22,163,74,.65) !important;
+}
+/* --- shortcut cards: bolder --- */
+.shortcut-card{
+  border-radius:16px !important;
+  border:1px solid var(--border);
+  box-shadow:0 8px 20px -10px rgba(15,23,42,.10) !important;
+}
+.shortcut-card:hover{
+  border-color:var(--primary-light) !important;
+}
+.shortcut-icon{
+  width:56px !important;
+  height:56px !important;
+  font-size:1.7rem !important;
+  border-radius:16px !important;
+}
+/* --- section titles with accent bar --- */
+.shortcuts-title,.card-header h3{
+  position:relative;
+  padding-left:14px;
+}
+.shortcuts-title::before,.card-header h3::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:2px;
+  bottom:2px;
+  width:4px;
+  border-radius:4px;
+  background:linear-gradient(180deg,var(--primary),var(--accent));
+}
+/* --- tables: premium header --- */
+thead th{
+  background:linear-gradient(180deg,#f1f5f9,#e2e8f0) !important;
+  font-size:.75rem !important;
+  letter-spacing:.06em !important;
+  text-transform:uppercase !important;
+  padding:14px 16px !important;
+}
+/* --- badges pop --- */
+.badge-done,.badge-pending,.badge-status{
+  font-weight:700 !important;
+  padding:5px 12px !important;
+  border-radius:999px !important;
+}
+
+/* ===== Guideline essentials (kept from polish pass) ===== */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+h1,h2,h3{text-wrap:balance;}
+.stat-card .value,.value,.metric,td,th,.amount,.doc-fee{font-variant-numeric:tabular-nums;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:6px;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none !important;animation:none !important;}}
+
+</style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand">
+        <div class="brand-logo">C+</div>
+        <div class="brand-text">
+          <h1>CarePoint Hospital</h1>
+          <p>Management System</p>
+        </div>
+      </a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html"><span>🏠</span> Dashboard</a></li>
+          <li><a href="patients.html"><span>👤</span> Patients</a></li>
+          <li><a href="visits.html"><span>🩺</span> Doctor Visit</a></li>
+          <li><a href="lab.html" class="active"><span>🧪</span> Lab Tests</a></li>
+          <li><a href="billing.html"><span>💳</span> Billing</a></li>
+          <li><a href="reports.html"><span>📊</span> Reports</a></li>
+          <li><a href="chat.html" class="nav-badge-ai"><span>💬</span> AI Assistant</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <div class="page-header">
+      <div class="page-title">
+        <h2>Diagnostic Lab & Test Orders</h2>
+        <p>Order tests from the price list, track pending investigations, and enter diagnostic results.</p>
+      </div>
+      <div>
+        <a href="billing.html" class="btn btn-outline">Go to Billing &rarr;</a>
+      </div>
+    </div>
+
+    <!-- Quick Stat Pills -->
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">🧪</div>
+        <div class="stat-meta">
+          <h3 id="statTotalTests">0</h3>
+          <p>Total Tests Ordered</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">⏳</div>
+        <div class="stat-meta">
+          <h3 id="statPendingTests" style="color: #d97706;">0</h3>
+          <p>Tests Pending Results</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">✅</div>
+        <div class="stat-meta">
+          <h3 id="statDoneTests" style="color: #16a34a;">0</h3>
+          <p>Tests Completed (Done)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lab-grid">
+      
+      <!-- Left Column: Order New Tests -->
+      <div class="card">
+        <div class="card-title">
+          <span>🧪</span> Order Diagnostic Tests
+        </div>
+
+        <form id="orderTestForm">
+          
+          <!-- Step 1: Search & Pick Patient -->
+          <div class="patient-picker-box">
+            <label style="margin-bottom: 6px; display: block;">1. Select Patient <span style="color:var(--danger)">*</span></label>
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="patientSearchInput" placeholder="Type patient ID (e.g. P-0001) or name…" autocomplete="off">
+            </div>
+            <div id="patientSuggestions" class="patient-suggestions"></div>
+
+            <div id="selectedPatientCard" class="selected-patient-card">
+              <div>
+                <div class="patient-meta-name" id="selectedPatientName">Patient Name (P-0000)</div>
+                <div class="patient-meta-sub" id="selectedPatientInfo">Details</div>
+              </div>
+              <button type="button" class="btn-clear-patient" id="btnClearPatient" title="Change patient">&times;</button>
+            </div>
+            <input type="hidden" id="selectedPatientId" required>
+          </div>
+
+          <!-- Order Date -->
+          <div class="form-group">
+            <label for="orderDate">Order Date <span style="color:var(--danger)">*</span></label>
+            <input type="date" id="orderDate" class="input-field" required>
+          </div>
+
+          <!-- Step 2: Choose Tests from Price List -->
+          <label style="margin-bottom: 6px; display: block;">2. Select Tests from Diagnostic Catalog <span style="color:var(--danger)">*</span></label>
+          <div class="test-catalog-box" id="testCatalogContainer">
+            <!-- Populated via JS catalog -->
+          </div>
+
+          <!-- Total Bill Callout -->
+          <div class="fee-callout">
+            <div>
+              <div class="fee-label">Total Test Amount (Auto-Billed)</div>
+              <div style="font-size: 11.5px; color: #047857;" id="selectedCountLabel">0 tests selected</div>
+            </div>
+            <div class="fee-value" id="orderTotalDisplay">Tk 0</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btnSubmitOrder">
+            <span>🔬</span> Order Tests & Add to Bill
+          </button>
+        </form>
+      </div>
+
+      <!-- Right Column: Lab Test Orders List -->
+      <div class="card">
+        <div class="card-title">
+          <span>📋</span> Lab Test Orders & Results
+        </div>
+
+        <div class="table-controls">
+          <div class="filter-tabs">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All Tests</button>
+            <button class="filter-btn" data-filter="pending" onclick="setFilter('pending', this)">Pending ⏳</button>
+            <button class="filter-btn" data-filter="done" onclick="setFilter('done', this)">Completed ✅</button>
+          </div>
+          <div class="search-input-wrap" style="width: 200px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="filterTableSearch" placeholder="Filter patient/test…" style="padding: 6px 10px 6px 30px; font-size: 12px; width: 100%; border: 1px solid var(--border); border-radius: 4px;">
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Test ID</th>
+                <th>Patient</th>
+                <th>Test Name</th>
+                <th>Cost</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="labTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Enter Results & Status Modal -->
+  <div class="modal-backdrop" id="resultModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 16px; font-weight: 700;">🧪 Enter Diagnostic Results</h3>
+        <button id="btnCloseModal" style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+      </div>
+
+      <div class="modal-meta-box" id="modalTestMeta">
+        <!-- Filled by JS -->
+      </div>
+
+      <form id="resultForm">
+        <input type="hidden" id="modalTestId">
+        
+        <div class="form-group">
+          <label for="modalStatus">Investigation Status <span style="color:var(--danger)">*</span></label>
+          <select id="modalStatus" class="input-field" required>
+            <option value="pending">Pending (Awaiting Lab Sample/Analysis)</option>
+            <option value="done">Done (Completed / Results Ready)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="modalResultValue">Lab Findings / Result Value <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="modalResultValue" class="input-field" placeholder="e.g. Hemoglobin: 13.5 g/dL (Normal: 12-16)" required>
+        </div>
+
+        <div class="form-group">
+          <label for="modalRemarks">Pathologist / Lab Remarks (Optional)</label>
+          <input type="text" id="modalRemarks" class="input-field" placeholder="e.g. Within normal biological reference range">
+        </div>
+
+        <div style="display:flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-outline" id="btnCancelModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="width: auto;">💾 Save Results</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast">Order placed successfully!</div>
+
+  <script>
+    const KEYS = {
+      PATIENTS: 'hm_patients',
+      LAB_TESTS: 'hm_lab_tests',
+      PAYMENTS: 'hm_payments'
+    };
+
+    // Standard Price List for Diagnostics in Taka (Tk)
+    const LAB_CATALOG = [
+      { id: 'T-CBC', name: 'Complete Blood Count (CBC)', cost: 500, ref: 'Hb: 12-16 g/dL, WBC: 4000-11000' },
+      { id: 'T-RBS', name: 'Random Blood Sugar (RBS)', cost: 250, ref: 'Normal: < 7.8 mmol/L' },
+      { id: 'T-FBS', name: 'Fasting Blood Sugar (FBS)', cost: 250, ref: 'Normal: 3.9 - 6.1 mmol/L' },
+      { id: 'T-LIPID', name: 'Lipid Profile (Cholesterol, HDL, LDL)', cost: 1200, ref: 'Total Chol < 200 mg/dL' },
+      { id: 'T-LFT', name: 'Liver Function Test (SGPT/ALT, SGOT)', cost: 1000, ref: 'SGPT: < 45 U/L' },
+      { id: 'T-CREAT', name: 'Serum Creatinine (Kidney)', cost: 450, ref: 'Normal: 0.6 - 1.2 mg/dL' },
+      { id: 'T-URINE', name: 'Urine Routine Examination (R/E)', cost: 300, ref: 'Color: Pale yellow, Pus cells: 1-2' },
+      { id: 'T-XRAY', name: 'Chest X-Ray P/A View', cost: 800, ref: 'Lungs clear, no active lesion' },
+      { id: 'T-ECG', name: '12-Lead Electrocardiogram (ECG)', cost: 500, ref: 'Normal sinus rhythm' },
+      { id: 'T-USG', name: 'Ultrasound of Whole Abdomen', cost: 1500, ref: 'Normal liver and kidneys' }
+    ];
+
+    function getData(key) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setData(key, val) {
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Populate Catalog Checklist
+    function renderCatalog() {
+      const container = document.getElementById('testCatalogContainer');
+      container.innerHTML = LAB_CATALOG.map((item, idx) => `
+        <label class="test-item-row" for="test_chk_${idx}">
+          <div class="test-checkbox-wrap">
+            <input type="checkbox" id="test_chk_${idx}" class="test-checkbox" 
+                   value="${item.id}" data-name="${item.name}" data-cost="${item.cost}" data-ref="${item.ref}" onchange="updateSelectedFee()">
+            <span>${item.name}</span>
+          </div>
+          <span class="test-price">Tk ${item.cost.toLocaleString()}</span>
+        </label>
+      `).join('');
+    }
+
+    // Calculate chosen test fees
+    window.updateSelectedFee = function() {
+      const checkedBoxes = document.querySelectorAll('.test-checkbox:checked');
+      let total = 0;
+      checkedBoxes.forEach(chk => {
+        total += Number(chk.dataset.cost || 0);
+      });
+      document.getElementById('orderTotalDisplay').textContent = `Tk ${total.toLocaleString()}`;
+      document.getElementById('selectedCountLabel').textContent = `${checkedBoxes.length} test${checkedBoxes.length === 1 ? '' : 's'} selected`;
+    };
+
+    // Patient Autocomplete
+    const searchInput = document.getElementById('patientSearchInput');
+    const suggestionsBox = document.getElementById('patientSuggestions');
+    const selectedCard = document.getElementById('selectedPatientCard');
+    const selectedPatientId = document.getElementById('selectedPatientId');
+
+    searchInput.addEventListener('input', function() {
+      const q = this.value.trim().toLowerCase();
+      if (!q) {
+        suggestionsBox.style.display = 'none';
+        return;
+      }
+
+      const patients = getData(KEYS.PATIENTS);
+      const matches = patients.filter(p => 
+        (p.id && p.id.toLowerCase().includes(q)) ||
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.phone && p.phone.toLowerCase().includes(q))
+      ).slice(0, 8);
+
+      if (matches.length === 0) {
+        suggestionsBox.innerHTML = '<div style="padding:10px; font-size:12px; color:#64748b;">No matching patients found.</div>';
+        suggestionsBox.style.display = 'block';
+        return;
+      }
+
+      suggestionsBox.innerHTML = matches.map(p => `
+        <div class="patient-suggestion-item" onclick="selectPatient('${p.id}')">
+          <div>
+            <strong>${p.name}</strong> <span style="font-family:monospace; color:var(--primary); font-size:11.5px;">(${p.id})</span>
+          </div>
+          <div style="font-size:11.5px; color:#64748b;">${p.gender}, ${p.age}y &middot; ${p.phone}</div>
+        </div>
+      `).join('');
+      suggestionsBox.style.display = 'block';
+    });
+
+    window.selectPatient = function(id) {
+      const patients = getData(KEYS.PATIENTS);
+      const patient = patients.find(p => p.id === id);
+      if (!patient) return;
+
+      selectedPatientId.value = patient.id;
+      document.getElementById('selectedPatientName').textContent = `${patient.name} (${patient.id})`;
+      document.getElementById('selectedPatientInfo').textContent = `Age: ${patient.age}y · ${patient.gender} · Phone: ${patient.phone}`;
+      
+      selectedCard.style.display = 'flex';
+      searchInput.value = '';
+      suggestionsBox.style.display = 'none';
+    };
+
+    document.getElementById('btnClearPatient').addEventListener('click', function() {
+      selectedPatientId.value = '';
+      selectedCard.style.display = 'none';
+      searchInput.value = '';
+      searchInput.focus();
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+        suggestionsBox.style.display = 'none';
+      }
+    });
+
+    // Handle Order Submission
+    document.getElementById('orderTestForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const patientId = selectedPatientId.value;
+      if (!patientId) {
+        alert('Please select a patient first.');
+        searchInput.focus();
+        return;
+      }
+
+      const orderDate = document.getElementById('orderDate').value;
+      const checkedBoxes = document.querySelectorAll('.test-checkbox:checked');
+      if (checkedBoxes.length === 0) {
+        alert('Please select at least one lab test from the list.');
+        return;
+      }
+
+      const labTests = getData(KEYS.LAB_TESTS);
+      const payments = getData(KEYS.PAYMENTS);
+      let totalBilled = 0;
+      const createdIds = [];
+
+      checkedBoxes.forEach(chk => {
+        const testName = chk.dataset.name;
+        const cost = Number(chk.dataset.cost) || 0;
+        const refRange = chk.dataset.ref || '';
+        const testId = 'LAB-' + String(labTests.length + createdIds.length + 101).padStart(4, '0');
+        createdIds.push(testId);
+        totalBilled += cost;
+
+        // 1. Add to Lab Tests
+        labTests.push({
+          id: testId,
+          patientId: patientId,
+          testName: testName,
+          cost: cost,
+          status: 'pending', // pending or done
+          result: '',
+          remarks: '',
+          refRange: refRange,
+          date: orderDate,
+          createdAt: new Date().toISOString()
+        });
+
+        // 2. Add to Billing Ledger (hm_payments)
+        payments.push({
+          id: 'BILL-' + (payments.length + 1001),
+          patientId: patientId,
+          type: 'lab',
+          referenceId: testId,
+          description: `Lab Test - ${testName}`,
+          amount: cost,
+          total: cost,
+          paid: 0,
+          due: cost,
+          method: 'Pending',
+          status: 'Unpaid',
+          date: orderDate,
+          createdAt: new Date().toISOString()
+        });
+      });
+
+      setData(KEYS.LAB_TESTS, labTests);
+      setData(KEYS.PAYMENTS, payments);
+
+      showToast(`Ordered ${checkedBoxes.length} test(s)! Tk ${totalBilled.toLocaleString()} added to bill.`);
+
+      // Reset
+      checkedBoxes.forEach(chk => { chk.checked = false; });
+      updateSelectedFee();
+      renderStats();
+      renderTable();
+    });
+
+    // Filter Logic
+    let currentFilter = 'all';
+    window.setFilter = function(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable();
+    };
+
+    document.getElementById('filterTableSearch').addEventListener('input', () => {
+      renderTable();
+    });
+
+    // Render Stats
+    function renderStats() {
+      const tests = getData(KEYS.LAB_TESTS);
+      const pending = tests.filter(t => t.status === 'pending').length;
+      const done = tests.filter(t => t.status === 'done').length;
+
+      document.getElementById('statTotalTests').textContent = tests.length;
+      document.getElementById('statPendingTests').textContent = pending;
+      document.getElementById('statDoneTests').textContent = done;
+    }
+
+    // Render Table
+    function renderTable() {
+      const tests = getData(KEYS.LAB_TESTS);
+      const patients = getData(KEYS.PATIENTS);
+      const patientMap = {};
+      patients.forEach(p => { patientMap[p.id] = p.name; });
+
+      const searchTerm = document.getElementById('filterTableSearch').value.toLowerCase().trim();
+
+      let filtered = [...tests].reverse();
+
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(t => t.status === currentFilter);
+      }
+
+      if (searchTerm) {
+        filtered = filtered.filter(t => 
+          t.id.toLowerCase().includes(searchTerm) ||
+          t.testName.toLowerCase().includes(searchTerm) ||
+          t.patientId.toLowerCase().includes(searchTerm) ||
+          (patientMap[t.patientId] && patientMap[t.patientId].toLowerCase().includes(searchTerm))
+        );
+      }
+
+      const tbody = document.getElementById('labTableBody');
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding: 32px; color: var(--text-muted);">
+              No diagnostic test records match your filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(t => {
+        const isDone = t.status === 'done';
+        const patientName = patientMap[t.patientId] || t.patientId;
+        return `
+          <tr>
+            <td><span class="id-badge">${t.id}</span></td>
+            <td>
+              <strong>${patientName}</strong><br>
+              <span style="font-size:11px; color:var(--text-muted);">${t.patientId} &middot; ${t.date}</span>
+            </td>
+            <td>
+              <strong>${t.testName}</strong>
+              ${t.result ? `<div style="font-size:11.5px; color:#047857; margin-top:2px;">Result: ${t.result}</div>` : ''}
+            </td>
+            <td><strong>Tk ${t.cost || 0}</strong></td>
+            <td>
+              <span class="badge-status ${isDone ? 'status-done' : 'status-pending'}">
+                ${isDone ? 'Done' : 'Pending'}
+              </span>
+            </td>
+            <td>
+              <button class="btn-action-res" onclick="openResultModal('${t.id}')">
+                ${isDone ? 'View / Edit Result' : 'Enter Result'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Modal Results Handling
+    window.openResultModal = function(testId) {
+      const tests = getData(KEYS.LAB_TESTS);
+      const patients = getData(KEYS.PATIENTS);
+      const test = tests.find(t => t.id === testId);
+      if (!test) return;
+
+      const p = patients.find(item => item.id === test.patientId) || { name: 'Patient', age: '-', gender: '-' };
+
+      document.getElementById('modalTestId').value = test.id;
+      document.getElementById('modalTestMeta').innerHTML = `
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <strong>${test.testName} (${test.id})</strong>
+          <span style="color:#047857; font-weight:700;">Tk ${test.cost}</span>
+        </div>
+        <div style="color:var(--text-muted); font-size:12px;">
+          Patient: ${p.name} (${test.patientId}) &middot; Ordered: ${test.date}
+        </div>
+        ${test.refRange ? `<div style="margin-top:6px; font-size:11.5px; color:#0369a1; background:#e0f2fe; padding:4px 8px; border-radius:4px;">Ref Range: ${test.refRange}</div>` : ''}
+      `;
+
+      document.getElementById('modalStatus').value = test.status || 'pending';
+      document.getElementById('modalResultValue').value = test.result || (test.refRange ? test.refRange.split(',')[0] : '');
+      document.getElementById('modalRemarks').value = test.remarks || '';
+
+      document.getElementById('resultModal').style.display = 'flex';
+    };
+
+    function closeModal() {
+      document.getElementById('resultModal').style.display = 'none';
+    }
+
+    document.getElementById('btnCloseModal').addEventListener('click', closeModal);
+    document.getElementById('btnCancelModal').addEventListener('click', closeModal);
+
+    document.getElementById('resultForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const testId = document.getElementById('modalTestId').value;
+      const status = document.getElementById('modalStatus').value;
+      const result = document.getElementById('modalResultValue').value.trim();
+      const remarks = document.getElementById('modalRemarks').value.trim();
+
+      const tests = getData(KEYS.LAB_TESTS);
+      const idx = tests.findIndex(t => t.id === testId);
+      if (idx !== -1) {
+        tests[idx].status = status;
+        tests[idx].result = result;
+        tests[idx].remarks = remarks;
+        tests[idx].completedAt = status === 'done' ? new Date().toISOString() : null;
+        setData(KEYS.LAB_TESTS, tests);
+        showToast(`Diagnostic result updated for ${testId}!`);
+      }
+
+      closeModal();
+      renderStats();
+      renderTable();
+    });
+
+    // Check pre-selected patient from URL parameter
+    function checkUrlPatientParam() {
+      const params = new URLSearchParams(window.location.search);
+      const pId = params.get('patientId');
+      if (pId) {
+        selectPatient(pId);
+      }
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
+      renderCatalog();
+      renderStats();
+      renderTable();
+      checkUrlPatientParam();
+    });
+  </script>
+</body>
+</html>
